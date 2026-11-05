@@ -22,7 +22,7 @@ internet.
 | **Impact** | [The problem](#the-problem) · [Results](#results-honest-numbers) (liquid saved) |
 | **Use of Meta AI tooling** | [How we use Meta AI](#how-we-use-meta-ai) · [AI teaches AI](#the-core-idea-big-ai-teaches-a-small-model) |
 | **Demo** | [Run it](#run-it) · [The platform](#the-platform-what-you-click) · [Simulator](#the-simulator-the-robot-before-the-robot) |
-| **Technical depth** | [Architecture](#architecture) · [Geometry](#geometry-from-pixels-to-a-spray) · [Safety](#safety-by-design) · [Measured latency](#measured-latency) |
+| **Technical depth** | [Architecture](#architecture) · [Geometry](#geometry-from-pixels-to-a-spray) · [Motion, encoder and the wiper arm](#motion-encoder-and-the-wiper-arm-the-measured-robot) · [Safety](#safety-by-design) · [Measured latency](#measured-latency) |
 
 ---
 
@@ -159,7 +159,7 @@ sequenceDiagram
 ## Geometry: from pixels to a spray
 
 All positions are centimetres: `x` forward, `y` to the left, origin under the arm's pivot. The camera looks straight down
-about 25 cm above the ridge top.
+(29 cm above the soil on the real robot; the simulator's default is 25 cm).
 
 - **Two ground planes.** The crop sits on a raised ridge and weeds often grow in the furrow 8 cm lower. The same pixel is a
   different place on each plane, so the code places a point on the ridge, picks the plane, and places it again.
@@ -169,6 +169,87 @@ about 25 cm above the ridge top.
   `phi = asin(y / L)` and the car must stop `L cos(phi)` **before** the weed: `stop tick = weed tick - L cos(phi)`.
 - **Validated independently** against OpenCV (`projectPoints`/`solvePnP`): a straight-down grid is recovered to
   **0.006 cm** maximum error, and a camera tilted 5 degrees to **0.007 cm** with the A4 homography (0.4 cm without it).
+
+## Motion, encoder and the wiper arm (the measured robot)
+
+The simulator started with guessed numbers. These are the **measured** ones from the real robot (`calib/robot.json`,
+`calib/hardware.json`), and everything below is computed from them:
+
+| Quantity | Value | How it is known |
+|---|---|---|
+| Arm length `L` (pivot to nozzle) | **8.0 cm** | measured |
+| Camera ahead of the arm pivot `D` | **16.5 cm** | measured |
+| Camera height above the soil | **29 cm** | measured |
+| Camera field of view | **20.8 degrees** (a phone camera, narrow) | measured |
+| One picture covers | **10.7 x 8.0 cm** of ground, **0.08 mm per pixel** | computed: `2 h tan(fov/2)` |
+| The camera sees ground | **12.5 to 20.5 cm** ahead of the pivot | computed: `D +/- half a picture` |
+| Wet radius of the spray | 0.75 cm (+ 0.25 cm safety margin) | measured |
+| Arm reach to the side | **+/- 7.9 cm** (`L sin 80 degrees`) | computed from the servo limit |
+
+### The wiper ("wing") arm
+
+A conventional pan-tilt nozzle needs two servos and a lot of trigonometry. We use **one SG90 servo that swings an 8 cm arm
+like a windshield wiper** across the row. The arm sweeps an **arc of radius `L` ahead of the pivot**, so a point is reachable
+only if it is on that arc. The planner turns "weed at `(x, y)`" into the two things the hardware can do:
+
+```
+arm angle      phi  = asin(y / L)                  (the servo goes to 90 + trim + phi)
+stop the car   x_stop = x_weed - L * cos(phi)      (the pivot must be L cos(phi) BEHIND the weed)
+```
+
+```
+            weed (x, y)
+               *
+   arm tip -> /|      <- the nozzle moves on this arc, radius L = 8 cm
+             / |y
+   pivot -> o--+------> driving direction (+x)
+        stop here: x_weed - L cos(phi)
+```
+
+Worked example: a weed 4 cm to the side gives `phi = 30 degrees`; the car stops `8 cos 30 = 6.9 cm` before it. At the nozzle,
+**1 degree of servo = 0.14 cm**, so even a 5-degree error stays inside the 0.75 cm wet radius. The SG90 turns 60 degrees in
+0.1 s, so the swing costs almost nothing, and the planner waits exactly that travel time, no more.
+
+Why an arm on an arc instead of a gantry: it is one cheap servo, there is nothing to jam, and the **geometry stays a closed
+form**, so the planner can plan the whole row exactly and the simulator can score it. The price is that the car must do the
+forward-and-back work: the **encoder is the other half of the aim**.
+
+### The encoder and motion control
+
+Forward and back is controlled by the wheel encoder, not by time.
+
+- **Sensor:** a single-channel slot encoder (20 slots, 65 mm wheel, so about **1.02 cm per tick**; the exact `cm_per_tick` is
+  measured on the rails with `tools/measure_ticks.py`). The pin has a **100 microsecond glitch filter**, so electrical noise is
+  not counted as distance.
+- **One channel cannot give direction**, so each tick counts in the direction last commanded, even while the car coasts after
+  `stop()`. The planner knows this and stops `speed x coast time` early.
+- **Speed loop:** the L298N drives the front and rear axles; a **50 Hz PI loop** with a feed-forward term holds the commanded
+  speed against friction and battery sag, with a minimum duty (35%) below which the motors would stall and a ramp (120% per
+  second) so the car never slams. Maximum speed is 8 cm/s; the demo speed is 3 cm/s.
+- **Active braking:** both bridge inputs high for 0.3 s, then released.
+- **Stall detection:** if the motors are driven and the encoder counts nothing for 3 s, the motors stop and the run reports
+  *why*. The same mechanism **finds the end of the tray**: when the car presses the wall, the planner records the wall's tick
+  and treats that picture as the last one.
+- **Precision is honest, not magical:** one tick is about 1 cm and the wet radius is 0.75 cm, so a +/-1 tick stop error is the
+  same size as the spray. That is why the planner settles 0.3 s after every stop, re-checks the **real** landing point against
+  every crop before each spray, and keeps a safety margin.
+
+### Stop-and-go, one picture at a time (`planner.run_stepwise`)
+
+The camera sees a tiny 10.7 x 8.0 cm window, and the cloud AI takes 10-35 s per picture, so the robot moves like a surveyor:
+
+1. **Stop**, settle, take a picture; **crop it to the tray** (`tray.py` finds the two walls, so anything outside the field can
+   never be sprayed).
+2. **Detect** (SAM + Muse, or YOLO) in a **worker thread**: the control loop keeps reading the encoder, so detection time never
+   freezes the motors.
+3. **Spray what is reachable:** for every weed, drive forward or back to its stop tick, swing the arm, pulse the pump, park the
+   arm. A weed near the front edge **waits for the next picture**, because what grows just beyond it (a crop?) must be seen
+   first.
+4. **Advance** one picture's length and repeat, until the tray ends.
+
+Because the camera looks 12.5-20.5 cm ahead of the pivot and the arm reaches only 8 cm, **every weed in a picture is outside
+the arm's reach until the car drives up to it**. The planner is built around that: it does not guess, it moves the pivot to the
+exact tick where the weed lies on the arc.
 
 ## Safety by design
 
@@ -278,13 +359,14 @@ python tools/sim.py --field tomato-3 --lifecycle      # data columns -> offline 
 ```
 
 One simulator finding shaped the hardware: the wiper nozzle sits `L cos(phi)` **ahead** of its pivot, so for a one-pass run the
-camera must see a weed before the pivot is that far behind it, about arm length + half a frame (~40 cm). With the camera 12 cm
-ahead every central weed is seen too late, so the tested plan is **two passes** (map, drive back, spray).
+camera must see a weed before the pivot is that far behind it, about arm length + half a frame. With the simulator's default
+25 cm arm that means a camera ~40 cm ahead (with it 12 cm ahead every central weed is seen too late, so the tested plan there is
+**two passes**). The real robot's 8 cm arm and 16.5 cm camera offset satisfy the condition, and it works stop-and-go.
 
 ## Hardware
 
-Raspberry Pi 4, an L298N driving 4 DC motors, a single-channel slot encoder on a wheel, an SG90 servo wiper arm (hardware-timed
-PWM through pigpio), a pump (a **dummy GPIO / LED for now**), and an Android or iPhone as the camera (a web page on the phone
+Raspberry Pi 4, an L298N driving 4 DC motors with an encoder-based speed loop, a single-channel slot encoder on a wheel, an 8 cm
+SG90 servo wiper arm (hardware-timed PWM through pigpio), a pump (a **dummy GPIO / LED for now**), and an Android or iPhone as the camera (a web page on the phone
 sends photos over HTTPS + WebSocket). Every pin and limit lives in [`calib/hardware.json`](calib/hardware.json)
 (documented in [`calib/HARDWARE.md`](calib/HARDWARE.md)); nothing else hard-codes a pin.
 
@@ -342,8 +424,9 @@ We would rather state these than have you find them:
 - **Muse is not perfectly repeatable**, so one run is not a result. We report ranges.
 - **Real-photo evidence is small** (3 labeled photos) and the checklist was learned from them.
 - **The pump is a dummy output.** The robot logs and records where it would spray; real liquid is a push button.
-- **Robot numbers need measuring**: calibration values (arm length, flow, latencies) start as placeholders until measured on
-  the robot.
+- **Some robot numbers are still to be measured**: arm length, camera position and field of view are measured, but `cm_per_tick`
+  (nominal 1.02 cm from the wheel and slot count), the pump flow and the latencies are still placeholders until measured on the
+  rails (`tools/measure_ticks.py`, `tools/calibrate_a4.py`).
 - **One crop so far** (molokhia on a tray) plus tomato and carrot test fields.
 
 ## Hackathon
