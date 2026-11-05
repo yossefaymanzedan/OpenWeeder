@@ -1,0 +1,189 @@
+{% set title = 'OpenWeeder — Run on the field' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-body-strong font-caption text-caption">Run on the field</span>
+</div></header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+{% set CARD = 'bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg' %}
+{% set BTN = 'bg-primary-container text-on-primary hover:bg-black px-space-lg py-2.5 rounded-lg text-body-strong font-body-strong min-h-[48px] disabled:opacity-40 disabled:cursor-not-allowed' %}
+<section class="{{ CARD }}">
+<h1 class="font-page-title text-page-title text-primary tracking-tight">Run on the field</h1>
+<p class="text-body-default text-on-surface-variant mt-1">Choose a crop and how the robot detects weeds, then start it. The robot drives along the column, detects the weeds, sprays them, and records what it saw as a video.</p>
+</section>
+
+<section class="{{ CARD }} flex flex-col gap-space-sm">
+<h2 class="text-section-title font-section-title text-primary">1. Crop and detector</h2>
+{% for o in options %}
+<div class="opt border border-outline-variant rounded-lg p-space-md" data-crop="{{ o.crop }}" data-rec="{{ o.use }}" data-has-model="{{ 'yes' if o.has_model else 'no' }}">
+<label class="flex items-center gap-space-md cursor-pointer">
+<input type="radio" name="model" value="{{ o.crop }}" class="w-4 h-4 text-secondary" {{ 'checked' if loop.first }}>
+<div class="flex-1"><div class="text-body-strong font-body-strong text-primary">{{ o.crop }}</div>
+<div class="text-caption text-on-surface-variant">{% if o.has_model %}YOLO model saved {{ o.saved }}{% else %}no YOLO model yet{% endif %}</div></div>
+</label>
+<div class="advice mt-space-xs rounded-lg px-space-sm py-space-xs text-caption {{ 'bg-[#FFF4DC] text-[#6b4a00] border border-[#E3A21A]' if o.level == 'warn' else 'bg-[#E4F4EA] text-[#0b5a33] border border-[#2E9E5B]' }}" data-use="{{ o.use }}">
+<b>{{ 'Advice: use SAM + Muse.' if o.use == 'sam_muse' else 'Advice: the YOLO model is good enough.' }}</b> {{ o.text }}
+</div>
+</div>
+{% else %}
+<p class="text-body-default text-on-surface-variant" id="no-models">No crop has finished its steps yet. <a class="underline" href="/crop/new">Create one</a>.</p>
+{% endfor %}
+{% if options %}
+<div class="mt-space-xs flex flex-col gap-2" id="modes">
+<label class="flex items-start gap-space-sm cursor-pointer"><input type="radio" name="mode" value="yolo" class="mt-1 w-4 h-4 text-secondary"><span><b class="text-primary">YOLO model</b> <span class="text-caption text-on-surface-variant">fast and offline: detects while driving. Needs a trained model; below mAP50 {{ '%.2f'|format(min_map50|default(0.7)) }} it misses too many weeds.</span></span></label>
+<label class="flex items-start gap-space-sm cursor-pointer"><input type="radio" name="mode" value="sam_muse" class="mt-1 w-4 h-4 text-secondary"><span><b class="text-primary">SAM + Muse</b> <span class="text-caption text-on-surface-variant">the robot moves a step, stops, takes a picture, SAM finds every plant, Muse Spark calls each one crop or weed with this crop's saved checklist, and the robot sprays or not. More accurate than the YOLO model today, but slow (about 30 to 40 seconds per picture) and it costs about 2 cents per picture.</span></span></label>
+</div>
+<div id="sm-panel" class="border border-outline-variant rounded-lg p-space-md mt-space-xs">
+<div class="text-body-strong font-body-strong text-primary mb-1">SAM + Muse: measured and planned</div>
+<div id="sm-measured" class="text-caption text-on-surface-variant mb-space-sm"></div>
+<div class="flex flex-wrap gap-3 items-end">
+<label class="text-label-instrument font-label-instrument text-on-surface-variant">STEP BETWEEN PICTURES (CM)<br><input id="step" type="number" min="5" max="40" value="{{ step_cm|default(19) }}" class="mt-1 w-28 border border-outline-variant rounded-lg px-2 py-2 text-body-default"></label>
+<label class="text-label-instrument font-label-instrument text-on-surface-variant">FIELD TO COVER (M)<br><input id="rowlen" type="number" min="0.1" max="1000" step="0.1" value="1" class="mt-1 w-28 border border-outline-variant rounded-lg px-2 py-2 text-body-default"></label>
+</div>
+<p id="sm-est" class="text-body-default text-primary mt-space-sm"></p>
+<p class="text-caption text-on-surface-variant">Field to cover = how much of the field, measured from where the arm's pivot starts, gets photographed and treated. It is not the car's length. One run covers at most {{ (field_limit or 200) / 100 }} m.</p>
+<p class="text-caption text-on-surface-variant">A picture covers about {{ picture_cm or 28 }} cm of ground (from the camera's measured height), so the default step of {{ picture_cm or 28 }} cm takes the pictures edge to edge. A smaller step overlaps them: every spot is seen more than once, but it takes longer and costs more. Estimate = pictures x (35 s Muse + SAM + stop, plus the drive at 3 cm/s) and 2 cents each.</p>
+</div>
+{% endif %}
+</section>
+
+<section class="{{ CARD }}">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">2. Robot</h2>
+<div class="flex flex-wrap gap-2 items-center">
+<label class="text-label-instrument font-label-instrument text-on-surface-variant mr-2">HOLD THE ARM AT EACH WEED (S)<br><input id="hold" type="number" min="0" max="120" step="1" value="{{ aim_hold or 0 }}" class="mt-1 w-28 border border-outline-variant rounded-lg px-2 py-2 text-body-default"></label>
+<button id="go" class="{{ BTN }}" {{ 'disabled' if not options }}>Start</button>
+<button id="halt" class="{{ BTN }}" {{ 'disabled' if not options }}>Stop</button>
+<span id="msg" class="text-caption text-on-surface-variant"></span>
+</div>
+<p class="text-caption text-on-surface-variant mt-space-xs">Stop and go: the robot stops, takes a picture (cut to the tray), waits for the detection, sprays the weeds in that picture (backing up a little for weeds the 8 cm arm cannot reach from where it stopped), then moves one picture on (about {{ picture_cm or 28 }} cm) and repeats. A weed at a picture's front edge waits for the next picture, in case a crop grows just beyond it. The pump is a dummy pin: the log and video show where it would have sprayed. It covers at most {{ field_limit or 200 }} cm per run. For calibration, the arm can stay aimed at each weed for some seconds before the pump, so you can see where the nozzle really points (0 = no wait). Every run is saved below as a video with a summary.</p>
+<div id="run-box" class="mt-space-md border border-outline-variant rounded-lg p-space-md" style="display:none">
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-caption">
+<div><div class="font-label-instrument text-label-instrument text-on-surface-variant">PHASE</div><div id="r-phase" class="text-body-strong font-body-strong text-primary">-</div></div>
+<div><div class="font-label-instrument text-label-instrument text-on-surface-variant">PICTURES</div><div id="r-frames" class="text-body-strong font-body-strong text-primary">-</div></div>
+<div><div class="font-label-instrument text-label-instrument text-on-surface-variant">WEEDS / SPRAYS / SKIPPED</div><div id="r-weeds" class="text-body-strong font-body-strong text-primary">-</div></div>
+<div><div class="font-label-instrument text-label-instrument text-on-surface-variant">TIME / API COST</div><div id="r-time" class="text-body-strong font-body-strong text-primary">-</div></div>
+</div>
+<img id="run-live" alt="The latest picture with its detections" class="w-full rounded mt-space-sm" style="display:none">
+<p class="text-caption text-on-surface-variant mt-1">Latest picture: crop green, weed red, unsure grey, spray point red cross, tray walls blue.</p>
+</div>
+<div class="mt-space-md">
+<div class="text-body-strong font-body-strong text-primary">Camera and field crop</div>
+<p class="text-caption text-on-surface-variant mb-space-xs">Left: what the phone on the robot sees, with the tray's walls in red and the picture's centre in blue. Right: the tray cut out straight and centred, which is what the detectors will look at. Use it to line up the phone.</p>
+<div id="live" class="border border-dashed border-outline-variant rounded-lg min-h-[200px] flex items-center justify-center text-on-surface-variant text-caption overflow-hidden">
+<img id="tray-img" alt="Camera view with the field cropped" class="max-w-full" style="display:none">
+<div id="tray-empty" class="flex flex-wrap items-center justify-center gap-space-md p-space-md text-left">
+<img id="run-qr" src="/camera/qr.svg" alt="QR code of the robot camera link" class="w-36 h-36 bg-white rounded" style="display:none">
+<div><div class="font-label-instrument text-label-instrument">NO CAMERA: OPEN THIS ON THE PHONE ON THE ROBOT</div>
+<div id="run-link" class="text-section-title font-section-title text-primary break-all mt-1"></div>
+<div class="mt-1">Scan the code with the phone's camera, accept the security warning, allow the camera.</div></div>
+</div>
+</div>
+<p id="tray-info" class="text-body-default text-primary mt-space-xs"></p>
+</div>
+</section>
+
+<section class="{{ CARD }}">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">Recorded runs</h2>
+<div id="vids" class="flex flex-col gap-2 text-caption">
+{% for o in options %}{% for v in videos.get(o.crop, []) %}
+{% set s = ((summaries or {}).get(o.crop) or {}).get(v) %}
+<div class="vid" data-crop="{{ o.crop }}"><div class="mb-1">{{ o.crop }} &middot; {{ v }}{% if s %} &middot; {{ 'SAM + Muse' if s.mode == 'sam_muse' else 'YOLO' }}, {{ s.phase }}: {{ s.frames }} pictures, {{ s.weeds }} weeds, {{ s.sprays }} sprays, {{ s.skipped }} skipped, {{ s.seconds }} s, ${{ s.usd }}{% if s.dropped_outside_tray %}, {{ s.dropped_outside_tray }} outside the tray ignored{% endif %}{% if s.error %} &middot; error: {{ s.error }}{% endif %}{% endif %}</div>{% set lv = ((lives or {}).get(o.crop) or {}).get(v) %}
+<div class="grid grid-cols-1 {{ 'sm:grid-cols-2' if lv }} gap-2">
+<div><div class="text-on-surface-variant mb-1">Segmentation at each stop</div><video controls preload="none" class="w-full rounded" src="/field_run_video/{{ o.crop }}/{{ v }}"></video></div>
+{% if lv %}<div><div class="text-on-surface-variant mb-1">Real-time video</div><video controls preload="none" class="w-full rounded" src="/field_run_video/{{ o.crop }}/{{ lv }}"></video></div>{% endif %}
+</div></div>
+{% endfor %}{% endfor %}
+{% if not has_videos %}<p class="text-on-surface-variant" id="no-vids">No runs recorded yet.</p>{% endif %}
+</div>
+</section>
+
+<script>
+const $ = id => document.getElementById(id);
+const CMP = {{ (compare or {})|tojson }};
+function est() {
+  const step = Math.max(1, +$('step').value || 1), row = Math.max(0, +$('rowlen').value || 0);
+  const n = Math.ceil(row * 100 / step), secs = n * (35 + step / 3), usd = n * 0.02;
+  $('sm-est').textContent = `${row} m at ${step} cm = ${n} pictures, about ${(secs / 3600).toFixed(1)} hours and $${usd.toFixed(2)}`;
+}
+function showMeasured() {
+  const c = CMP[chosen()], el = $('sm-measured');
+  if (!c || !c['2']) { el.textContent = 'Not measured for this crop yet: run python tools/compare_detectors.py ' + (chosen() || '<crop>') + '.'; return; }
+  const r = c['2'], s = [...r.seconds_each].sort((a, b) => a - b);
+  el.innerHTML = `Measured on ${c.photos} of your real labeled photos (${c.at}): weeds found <b>${r.weeds_found}/${r.weeds_total} (${r.weeds_found_pct}%)</b>, crop hits <b>${r.crop_hits}</b>, about <b>${s[Math.floor(s.length / 2)]} s</b> per picture. ${c.variation || ''} ${c.note || ''}`;
+}
+const chosenOpt = () => document.querySelector('input[name=model]:checked')?.closest('.opt');
+const chosen = () => chosenOpt()?.dataset.crop;
+const mode = () => document.querySelector('input[name=mode]:checked')?.value;
+function syncMode() {   // pre-select what the advice says; YOLO only if a model exists
+  const o = chosenOpt(); if (!o) return;
+  const yolo = document.querySelector('input[name=mode][value=yolo]');
+  yolo.disabled = o.dataset.hasModel !== 'yes';
+  document.querySelector('input[name=mode][value=' + o.dataset.rec + ']').checked = true;
+}
+document.querySelectorAll('input[name=model]').forEach(r => r.addEventListener('change', () => { syncMode(); showMeasured(); }));
+if ($('step')) {
+  $('step').addEventListener('input', est); $('rowlen').addEventListener('input', est);
+  syncMode(); showMeasured(); est();
+}
+const FIELD_LIMIT = {{ (field_limit or 200)|tojson }};
+let runCrop = null, wasRunning = false;
+async function call(path) {
+  const c = chosen(); if (!c) { $('msg').textContent = 'Choose a crop first.'; return; }
+  const length = Math.min(FIELD_LIMIT, Math.round((+$('rowlen').value || 1) * 100));
+  if (path === 'start') {
+    const step = +$('step').value || 19, pics = Math.ceil(length / step);
+    const cost = mode() === 'sam_muse' ? ` About ${pics} pictures, about $${(pics * 0.02).toFixed(2)} of API calls.` : '';
+    if (!confirm(`The robot will drive ${length} cm forward, back, and forward again, and move its arm (the pump is a dummy pin).${cost} Is the path clear?`)) return;
+  }
+  const r = await (await fetch(`/api/field_run/${path}/${c}?mode=${mode()}&step=${$('step').value}&length=${length}&hold=${$('hold').value}`, {method: 'POST'})).json();
+  $('msg').textContent = r.msg || r.error || '';
+  runCrop = c; pollRun();
+}
+$('go').onclick = () => call('start');
+$('halt').onclick = () => call('stop');
+async function pollRun() {
+  const c = runCrop || chosen(); if (!c) return;
+  let r;
+  try { r = await (await fetch('/api/field_run/status/' + c)).json(); } catch (e) { return; }
+  const s = r.status || {};
+  if (r.on || Object.keys(s).length) $('run-box').style.display = '';
+  if (r.msg) $('msg').textContent = r.msg;
+  $('go').disabled = r.on;
+  $('r-phase').textContent = s.phase || (r.on ? 'starting' : '-');
+  $('r-frames').textContent = s.frames != null ? `${s.detected}/${s.frames} detected` : '-';
+  $('r-weeds').textContent = s.weeds != null ? `${s.weeds} / ${s.sprays} / ${s.skipped}` : '-';
+  $('r-time').textContent = s.seconds != null ? `${s.seconds} s / $${s.usd}` : '-';
+  if (r.on) $('run-live').src = `/field_run_live/${c}.jpg?t=${Date.now()}`;
+  if (wasRunning && !r.on && r.video) setTimeout(() => location.reload(), 1500);  // show the new video
+  wasRunning = r.on;
+}
+$('run-live').onload = () => { $('run-live').style.display = ''; };
+setInterval(pollRun, 1000); pollRun();
+async function pollTray() {
+  let t = {};
+  try { t = await (await fetch('/api/camera/tray')).json(); } catch (e) { return; }
+  if (t.camera === false) {
+    $('tray-img').style.display = 'none'; $('tray-empty').style.display = ''; $('tray-info').textContent = '';
+    try {
+      const c = await (await fetch('/api/camera')).json();
+      $('run-link').innerHTML = (c.links || []).map(l => `<a class="underline" href="${l}" target="_blank" rel="noopener">${l}</a>`).join('<br>');
+      $('run-qr').style.display = c.links && c.links.length ? '' : 'none';
+    } catch (e) { /* leave as is */ }
+    return;
+  }
+  $('tray-img').src = '/camera/tray.jpg?t=' + Date.now();
+  if (!t.found) { $('tray-info').textContent = 'No tray found in the picture.'; return; }
+  const side = Math.abs(t.offset_pct) < 2 ? 'centred' : `${Math.abs(t.offset_pct)}% ${t.offset_pct < 0 ? 'left' : 'right'} of the picture centre`;
+  $('tray-info').textContent = `Tray found: ${side}, tilted ${t.tilt_deg} degrees, ${t.width_pct}% of the picture width.`;
+}
+$('tray-img').onload = () => { $('tray-img').style.display = ''; $('tray-empty').style.display = 'none'; };
+$('tray-img').onerror = () => { $('tray-img').style.display = 'none'; };
+pollTray(); setInterval(pollTray, 1000);
+</script>
+</main>
+</body></html>

@@ -1,0 +1,8 @@
+openai
+pillow
+numpy
+opencv-python
+python-dotenv
+meta-sam-parser
+flask
+ultralytics

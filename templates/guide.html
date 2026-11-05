@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder - Field Photo Standards</title>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts: IBM Plex Sans & JetBrains Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#020603",
+            "surface-bright": "#f2fcf3",
+            "primary-fixed": "#dce5dc",
+            "primary-container": "#18201b",
+            "inverse-surface": "#29332d",
+            "surface-container-low": "#ecf6ed",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#dbe5dc",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#279856",
+            "on-secondary-fixed": "#002110",
+            "tertiary-fixed": "#8df9ac",
+            "tertiary-container": "#00240e",
+            "on-primary-fixed": "#151d18",
+            "secondary-container": "#9bf2bb",
+            "on-secondary-fixed-variant": "#00522f",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed-variant": "#404943",
+            "secondary-fixed": "#9ef5be",
+            "tertiary": "#000602",
+            "on-surface": "#141e18",
+            "on-secondary": "#ffffff",
+            "background": "#f2fcf3",
+            "surface": "#f2fcf3",
+            "surface-tint": "#58605a",
+            "outline-variant": "#c4c8c2",
+            "outline": "#747874",
+            "primary-fixed-dim": "#c0c9c1",
+            "on-tertiary-fixed-variant": "#005229",
+            "surface-variant": "#dbe5dc",
+            "on-background": "#141e18",
+            "secondary": "#066c41",
+            "surface-container": "#e6f1e7",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#71dc92",
+            "inverse-primary": "#c0c9c1",
+            "on-tertiary-fixed": "#00210d",
+            "secondary-fixed-dim": "#82d8a3",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e0ebe2",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#e9f3ea",
+            "surface-dim": "#d2ddd4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#107145",
+            "on-surface-variant": "#434844"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "1.25rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.5rem",
+            "space-2xs": "0.25rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "section-title": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "body-strong": ["IBM Plex Sans"],
+            "metric-display-mobile": ["JetBrains Mono"],
+            "page-title": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "section-title": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "label-instrument": ["12px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "caption": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "metric-inline": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "body-default": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-strong": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "metric-display-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen antialiased flex flex-col font-body-default text-body-default selection:bg-secondary selection:text-on-secondary">
+{% include '_nav.html' %}
+{% set P = field_plan(field if field is defined else None) %}
+<!-- SHARED COMPONENT: SideNavBar (Fixed Left, 64 = 16rem = 256px) -->
+<!-- MAIN VIEWPORT CONTAINER (Offset 64 = 16rem = 256px for SideNavBar, pb-16 for Footer) -->
+<div class="flex-1 flex flex-col pb-16">
+<!-- SHARED COMPONENT: TopNavBar -->
+<header class="flex justify-between items-center w-full px-4 lg:px-gutter-desktop py-space-sm border-b border-outline-variant bg-surface-container-lowest sticky top-0 z-30 flex-wrap gap-2">
+<div class="flex items-center gap-space-md">
+<span class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</span>
+<span class="text-outline-variant">|</span>
+<!-- Breadcrumb Link from JSON & context -->
+<div class="flex items-center gap-space-2xs font-body-default text-body-default text-on-surface-variant">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span>/</span>
+<span class="text-primary font-semibold">{{ field }}</span>
+<span>/</span>
+<span class="text-on-surface-variant">Photo Guide (Step 2 of 4)</span>
+</div>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-space-md">
+<!-- Diagnostic Action Icons -->
+<div class="flex items-center gap-space-xs text-on-surface-variant">
+
+
+
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+<!-- Trailing Action Buttons -->
+
+
+</div>
+</header>
+<!-- WORKSPACE CANVAS -->
+<main class="w-full px-4 lg:px-gutter-desktop py-space-md flex-1 flex flex-col gap-space-md">
+<!-- Subheader Operational Banner -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-space-md flex justify-between items-start">
+<div class="max-w-3xl">
+<div class="flex items-center gap-space-sm mb-space-2xs">
+<span class="px-space-xs py-0.5 bg-surface-container text-on-surface-variant border border-outline-variant font-label-instrument text-label-instrument rounded">
+              PHOTO GUIDE
+            </span>
+</div>
+<h1 class="text-page-title font-page-title text-primary tracking-tight">
+            How to take field photos
+          </h1>
+<p class="mt-space-2xs text-on-surface-variant text-body-default">
+            The AI can only judge what it can see clearly. Good photos mean fewer mistakes for you to fix.
+          </p>
+</div>
+<!-- Stepper Visual Readout -->
+<div class="flex flex-col items-end gap-space-2xs">
+<div class="flex items-center gap-space-xs">
+<span class="font-metric-inline text-caption text-on-surface-variant">STAGE PROGRESS</span>
+<span class="px-space-xs py-0.5 border border-outline-variant bg-surface-container-low font-metric-inline text-label-instrument text-primary rounded font-semibold">
+              Step 2 of 4
+            </span>
+</div>
+<!-- 4-step progress line -->
+<div class="flex items-center gap-1 w-36 mt-1">
+<div class="h-1 flex-1 bg-secondary rounded-full"></div>
+<div class="h-1 flex-1 bg-secondary rounded-full"></div>
+<div class="h-1 flex-1 bg-outline-variant rounded-full"></div>
+<div class="h-1 flex-1 bg-outline-variant rounded-full"></div>
+</div>
+<span class="text-caption font-label-instrument text-on-surface-variant mt-1">Next: upload {{ P.photos }} photos</span>
+</div>
+</div>
+<!-- MAIN WORKSPACE: BENTO/TWO-COLUMN TECHNICAL LAYOUT -->
+<div class="grid grid-cols-12 gap-space-md items-start">
+<!-- LEFT SECTION: DO & DON'T VISUAL GUIDE (8 Columns) -->
+<section class="col-span-12 lg:col-span-8 flex flex-col gap-space-md">
+<div class="flex justify-between items-center bg-surface-container-lowest border border-outline-variant p-space-sm rounded">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="photo_camera">photo_camera</span>
+<h2 class="text-section-title font-section-title text-primary">Do and don't</h2>
+</div>
+</div>
+<!-- The 4 DO/DON'T Cards Grid (2x2 Grid within the 8 cols) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md">
+<!-- CARD 1: DO (Shoot Straight Down 90° Zenith) -->
+<article class="bg-surface-container-lowest border-2 border-[#2E9E5B] rounded overflow-hidden flex flex-col">
+<!-- Header / Status Badge -->
+<div class="p-space-sm border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>
+<span class="font-label-instrument text-label-instrument text-primary font-semibold">● DO: Shoot straight down</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-lowest border border-[#2E9E5B] text-[#2E9E5B] font-metric-inline text-caption rounded">
+                  PASS
+                </span>
+</div>
+<!-- Photo Container -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Real carrot field photo taken straight down (CWFID dataset)" src="/static/guide/do_zenith.jpg"/>
+<!-- Optical reticle overlay overlaying technical instrumentation -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+<div class="w-20 h-20 border border-white/60 border-dashed rounded-full flex items-center justify-center">
+<div class="w-2 h-2 bg-secondary rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Content / Technical Specification -->
+<div class="p-space-sm flex flex-col justify-between flex-1 gap-space-xs">
+<div>
+<p class="font-body-strong text-body-strong text-primary">Hold the phone flat, pointing straight down at the row.</p>
+<p class="text-caption text-on-surface-variant mt-1">The AI sees each plant's leaf shape best from directly above.</p>
+</div>
+</div>
+</article>
+<!-- CARD 2: DON'T (Cast Operator Shadow) -->
+<article class="bg-surface-container-lowest border-2 border-[#D2452B] rounded overflow-hidden flex flex-col">
+<!-- Header / Status Badge -->
+<div class="p-space-sm border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-[#D2452B]"></span>
+<span class="font-label-instrument text-label-instrument text-primary font-semibold">● DON'T: Cast your shadow on the plants</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-lowest border border-[#D2452B] text-[#D2452B] font-metric-inline text-caption rounded">
+                  FAIL
+                </span>
+</div>
+<!-- Photo Container -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Simulated: a shadow added over a real field photo" src="/static/guide/dont_shadow.jpg"/>
+<!-- Error marker overlay -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+<div class="w-16 h-16 border-2 border-[#D2452B] rounded flex items-center justify-center bg-black/30">
+<span class="material-symbols-outlined text-[#D2452B] text-2xl" data-icon="block">block</span>
+</div>
+<span class="absolute top-2 right-2 font-metric-inline text-[11px] bg-[#D2452B] text-white px-1.5 py-0.5 rounded">SHADOW · SIMULATED</span>
+</div>
+</div>
+<!-- Content / Technical Specification -->
+<div class="p-space-sm flex flex-col justify-between flex-1 gap-space-xs">
+<div>
+<p class="font-body-strong text-body-strong text-primary">Stand so your shadow falls outside the photo.</p>
+<p class="text-caption text-on-surface-variant mt-1">Dark shadows hide leaves and make plants hard to tell apart from soil.</p>
+</div>
+</div>
+</article>
+<!-- CARD 3: DO (Natural Daylight, No Flash) -->
+<article class="bg-surface-container-lowest border-2 border-[#2E9E5B] rounded overflow-hidden flex flex-col">
+<!-- Header / Status Badge -->
+<div class="p-space-sm border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>
+<span class="font-label-instrument text-label-instrument text-primary font-semibold">● DO: Natural daylight, no flash</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-lowest border border-[#2E9E5B] text-[#2E9E5B] font-metric-inline text-caption rounded">
+                  PASS
+                </span>
+</div>
+<!-- Photo Container -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Real evenly lit carrot field photo (CWFID dataset)" src="/static/guide/do_light.jpg"/>
+<!-- Optical reticle overlay -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-between p-space-sm">
+<span></span>
+
+</div>
+</div>
+<!-- Content / Technical Specification -->
+<div class="p-space-sm flex flex-col justify-between flex-1 gap-space-xs">
+<div>
+<p class="font-body-strong text-body-strong text-primary">Use daylight. Turn the flash off.</p>
+<p class="text-caption text-on-surface-variant mt-1">Flash makes bright shiny spots on leaves.</p>
+</div>
+</div>
+</article>
+<!-- CARD 4: DON'T (Angled Perspective or Motion Blur) -->
+<article class="bg-surface-container-lowest border-2 border-[#D2452B] rounded overflow-hidden flex flex-col">
+<!-- Header / Status Badge -->
+<div class="p-space-sm border-b border-outline-variant flex justify-between items-center bg-surface-container-low">
+<div class="flex items-center gap-space-xs">
+<span class="w-2 h-2 rounded-full bg-[#D2452B]"></span>
+<span class="font-label-instrument text-label-instrument text-primary font-semibold">● DON'T: Angled perspective or motion blur</span>
+</div>
+<span class="px-space-xs py-0.5 bg-surface-container-lowest border border-[#D2452B] text-[#D2452B] font-metric-inline text-caption rounded">
+                  FAIL
+                </span>
+</div>
+<!-- Photo Container -->
+<div class="relative w-full h-56 bg-surface-container overflow-hidden border-b border-outline-variant">
+<img class="w-full h-full object-cover" data-alt="Simulated: tilt and motion blur added to a real field photo" src="/static/guide/dont_blur.jpg"/>
+<!-- Error marker overlay -->
+<div class="absolute inset-0 pointer-events-none flex items-center justify-center">
+<div class="w-16 h-16 border-2 border-[#D2452B] rounded flex items-center justify-center bg-black/30">
+<span class="material-symbols-outlined text-[#D2452B] text-2xl" data-icon="motion_blur">motion_blur</span>
+</div>
+<span class="absolute top-2 right-2 font-metric-inline text-[11px] bg-[#D2452B] text-white px-1.5 py-0.5 rounded">BLURRY · SIMULATED</span>
+</div>
+</div>
+<!-- Content / Technical Specification -->
+<div class="p-space-sm flex flex-col justify-between flex-1 gap-space-xs">
+<div>
+<p class="font-body-strong text-body-strong text-primary">Keep the phone level and still. Take each photo at a different spot along the row.</p>
+<p class="text-caption text-on-surface-variant mt-1">Tilted or blurry photos make plants look the wrong shape. The upload page warns you about blurry or dark photos.</p>
+</div>
+</div>
+</article>
+</div>
+<p class="text-caption font-caption text-on-surface-variant">Example photos: CWFID carrot field dataset (Haug &amp; Ostermann, 2014). The two “don't” examples are simulated from a real photo.</p>
+</section>
+<!-- RIGHT SECTION: FIELD READINESS CHECKLIST PANEL (4 Columns) -->
+<aside class="col-span-12 lg:col-span-4 flex flex-col gap-space-md">
+<!-- CHECKLIST CARD -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-space-md flex flex-col">
+<!-- Card Header -->
+<div class="flex justify-between items-center border-b border-outline-variant pb-space-sm mb-space-sm">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="fact_check">fact_check</span>
+<h3 class="text-section-title font-section-title text-primary">Field Readiness Checklist</h3>
+</div>
+<span class="font-metric-inline text-caption text-[#D2452B] font-semibold bg-surface-container-lowest px-space-xs py-0.5 rounded border border-[#D2452B]" id="checklist-counter">
+                0 / 5 PENDING
+              </span>
+</div>
+<p class="text-caption text-on-surface-variant mb-space-sm">
+              Tick each one before you upload:
+            </p>
+<!-- Checklist Items -->
+<div class="flex flex-col gap-space-xs">
+<label class="flex items-start gap-space-sm p-space-xs border border-outline-variant rounded hover:bg-surface-container-low cursor-pointer transition-colors">
+<input class="mt-0.5 w-5 h-5 rounded border-outline-variant text-primary focus:ring-secondary focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="text-body-strong font-body-strong text-primary block">Camera lens clean</span>
+<span class="text-caption text-on-surface-variant font-label-instrument">Wipe off dust first</span>
+</div>
+<span class="row-icon material-symbols-outlined text-outline-variant text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</label>
+<label class="flex items-start gap-space-sm p-space-xs border border-outline-variant rounded hover:bg-surface-container-low cursor-pointer transition-colors">
+<input class="mt-0.5 w-5 h-5 rounded border-outline-variant text-primary focus:ring-secondary focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="text-body-strong font-body-strong text-primary block">{{ P.photos }} photos from different spots along the row</span>
+<span class="text-caption text-on-surface-variant font-label-instrument">Not the same plants twice</span>
+</div>
+<span class="row-icon material-symbols-outlined text-outline-variant text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</label>
+<label class="flex items-start gap-space-sm p-space-xs border border-outline-variant rounded hover:bg-surface-container-low cursor-pointer transition-colors">
+<input class="mt-0.5 w-5 h-5 rounded border-outline-variant text-primary focus:ring-secondary focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="text-body-strong font-body-strong text-primary block">Both crop and weeds visible</span>
+<span class="text-caption text-on-surface-variant font-label-instrument">So the AI is tested on both</span>
+</div>
+<span class="row-icon material-symbols-outlined text-outline-variant text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</label>
+<label class="flex items-start gap-space-sm p-space-xs border border-outline-variant rounded hover:bg-surface-container-low cursor-pointer transition-colors">
+<input class="mt-0.5 w-5 h-5 rounded border-outline-variant text-primary focus:ring-secondary focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="text-body-strong font-body-strong text-primary block">Same height for every photo</span>
+<span class="text-caption text-on-surface-variant font-label-instrument">So plants look the same size</span>
+</div>
+<span class="row-icon material-symbols-outlined text-outline-variant text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</label>
+<label class="flex items-start gap-space-sm p-space-xs border border-outline-variant rounded hover:bg-surface-container-low cursor-pointer transition-colors">
+<input class="mt-0.5 w-5 h-5 rounded border-outline-variant text-primary focus:ring-secondary focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="text-body-strong font-body-strong text-primary block">Taken today, in daylight</span>
+<span class="text-caption text-on-surface-variant font-label-instrument">Plants as they look now</span>
+</div>
+<span class="row-icon material-symbols-outlined text-outline-variant text-sm" data-icon="radio_button_unchecked">radio_button_unchecked</span>
+</label>
+</div>
+</div>
+<!-- AGRONOMY TIP CARD -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-space-md flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs border-b border-outline-variant pb-space-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="psychiatry">psychiatry</span>
+<h4 class="text-section-title font-section-title text-primary">Why {{ P.photos }} photos?</h4>
+</div>
+<p class="text-body-default text-on-surface-variant">
+              You label {{ P.label }} photos: the AI guesses every plant and you fix its mistakes. Then the AI labels the other {{ P.test }} on its own, so you can check it before it ever sprays.
+            </p>
+<!-- Technical Pipeline Diagram Metric -->
+<div class="mt-space-2xs p-space-xs bg-surface-container border border-outline-variant rounded flex items-center justify-between text-caption font-metric-inline">
+<div class="flex flex-col">
+<span class="text-[11px] text-on-surface-variant uppercase">You label</span>
+<span class="text-primary font-semibold">{{ P.label }} PHOTOS</span>
+</div>
+<span class="text-outline-variant">→</span>
+<div class="flex flex-col text-right">
+<span class="text-[11px] text-on-surface-variant uppercase">AI is tested on</span>
+<span class="text-secondary font-semibold">{{ P.test }} PHOTOS</span>
+</div>
+</div>
+</div>
+<!-- PRIMARY ACTION CTA -->
+<div class="flex flex-col gap-space-2xs">
+<a class="w-full bg-[#18201B] hover:bg-black text-[#FFFFFF] py-space-sm px-space-md rounded-[6px] font-body-strong text-body-strong flex items-center justify-center gap-space-xs transition-colors border border-transparent focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2 min-h-[52px]" href="/field/{{ field }}/upload">
+<span>I'm Ready to Upload ({{ P.photos }} Photos)</span>
+<span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+<p class="text-center font-metric-inline text-[11px] text-on-surface-variant">
+              FIELD: {{ field }} • {{ P.photos }} PHOTOS • {{ P.label }} LABELED + {{ P.test }} TEST
+            </p>
+</div>
+</aside>
+</div>
+</main>
+</div>
+<!-- Micro-interaction script to count checked checklist items -->
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const checkboxes = document.querySelectorAll('aside input[type="checkbox"]');
+      const counter = document.getElementById('checklist-counter');
+      
+      function updateCount() {
+        const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+        const total = checkboxes.length;
+        if (counter) {
+          counter.textContent = `${checked} / ${total} ${checked === total ? 'READY' : 'PENDING'}`;
+          if (checked === total) {
+            counter.className = 'font-metric-inline text-caption text-secondary font-semibold bg-surface-container-low px-space-xs py-0.5 rounded border border-outline-variant';
+          } else {
+            counter.className = 'font-metric-inline text-caption text-[#D2452B] font-semibold bg-surface-container-lowest px-space-xs py-0.5 rounded border border-[#D2452B]';
+          }
+        }
+      }
+
+      function syncIcons() {
+        checkboxes.forEach(cb => {
+          const icon = cb.closest('label').querySelector('.row-icon');
+          if (!icon) return;
+          if (cb.checked) {
+            icon.textContent = 'check_circle';
+            icon.setAttribute('data-icon', 'check_circle');
+            icon.classList.remove('text-outline-variant');
+            icon.classList.add('text-secondary');
+          } else {
+            icon.textContent = 'radio_button_unchecked';
+            icon.setAttribute('data-icon', 'radio_button_unchecked');
+            icon.classList.remove('text-secondary');
+            icon.classList.add('text-outline-variant');
+          }
+        });
+      }
+
+      checkboxes.forEach(cb => cb.addEventListener('change', () => { updateCount(); syncIcons(); }));
+      updateCount();
+      syncIcons();
+    });
+  </script>
+</body></html>

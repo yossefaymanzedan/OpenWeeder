@@ -1,0 +1,171 @@
+{# Learning screen body; re-rendered every few seconds while learning runs. #}
+{% set P = field_plan(field) %}
+{% set st = S.get('state', 'none') %}
+{% set card = 'bg-surface-container-lowest border border-[#DDE2DC] rounded p-space-md flex flex-col gap-space-sm' %}
+{% set btn = 'px-space-lg py-2.5 rounded font-label-instrument text-label-instrument min-h-[48px] flex items-center justify-center' %}
+<div data-running="{{ 1 if running else 0 }}" class="flex flex-col gap-space-md">
+
+<section class="{{ card }}">
+<div class="flex items-start justify-between gap-space-sm flex-wrap">
+<div>
+<h1 class="font-page-title-mobile text-page-title-mobile lg:font-page-title lg:text-page-title text-primary">The AI learns your field</h1>
+<p class="font-body-default text-body-default text-on-surface-variant mt-1 max-w-3xl">It measures your {{ labeled|length }} labeled photos, writes a checklist for telling {{ crop }} from weeds, then tests and improves that checklist on your {{ test_photos|length }} other photos (up to 3 rounds). Every checklist version is scored on your labeled photos, and the best one is kept.</p>
+</div>
+{% if running %}
+<span id="learn-state" class="px-space-xs py-1 rounded border border-[#E3A21A] bg-[#E3A21A]/15 text-[#8a5b00] font-label-instrument text-label-instrument animate-pulse">LEARNING…</span>
+{% elif st == 'done' %}
+<span id="learn-state" class="px-space-xs py-1 rounded border border-[#2E9E5B] bg-[#2E9E5B]/15 text-[#1e6e3c] font-label-instrument text-label-instrument">DONE</span>
+{% elif st == 'error' %}
+<span id="learn-state" class="px-space-xs py-1 rounded border border-[#D2452B] bg-[#D2452B]/10 text-[#a32e1b] font-label-instrument text-label-instrument">STOPPED</span>
+{% else %}
+<span id="learn-state" class="px-space-xs py-1 rounded border border-[#DDE2DC] font-label-instrument text-label-instrument text-on-surface-variant">NOT STARTED</span>
+{% endif %}
+</div>
+
+{% if labeled|length < P.label %}
+<div class="border border-[#E3A21A] rounded p-space-sm flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<span class="font-body-default text-body-default">Label {{ P.label }} photos first (you have {{ labeled|length }}).</span>
+<a href="/field/{{ field }}/upload" class="{{ btn }} bg-[#18201B] text-white">Go to upload</a>
+</div>
+{% elif running %}
+<div class="flex flex-col gap-2">
+<p id="learn-message" class="font-body-strong text-body-strong text-primary">{{ S.get('message', 'Starting…') }}</p>
+{% set pr = S.get('progress') or {} %}
+{% if pr.get('total') %}
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full bg-secondary transition-all" style="width: {{ (100 * pr.done / pr.total)|round(0) }}%"></div></div>
+<span class="font-caption text-caption text-on-surface-variant">{{ pr.done }} of {{ pr.total }} photos judged in this round</span>
+{% endif %}
+<span class="font-caption text-caption text-on-surface-variant">{{ S.get('seconds', 0)|round(0)|int }} s so far · ${{ '%.3f'|format(S.get('usd', 0)) }} · keep this page open or come back later</span>
+</div>
+{% elif st == 'done' %}
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<p class="font-body-default text-body-default">{{ S.message }} Took {{ S.get('seconds', 0)|round(0)|int }} s and ${{ '%.3f'|format(S.get('usd', 0)) }}.</p>
+<div class="flex gap-space-sm flex-wrap">
+<form id="relearn-form" method="post" action="/field/{{ field }}/learn"><button type="submit" class="{{ btn }} border border-outline-variant bg-surface-container-lowest text-primary hover:bg-surface-container">Learn again</button></form>
+<a href="/field/{{ field }}/results" class="{{ btn }} bg-[#18201B] text-white hover:bg-primary">Check the results</a>
+</div>
+</div>
+{% else %}
+{% if st == 'error' %}<p class="font-body-default text-body-default text-[#a32e1b]">{{ S.get('message') }}</p>{% endif %}
+<form id="learn-form" method="post" action="/field/{{ field }}/learn" class="flex flex-col sm:flex-row sm:items-center justify-between gap-space-sm">
+<span class="font-caption text-caption text-on-surface-variant">Takes a few minutes and about $0.30–0.60 in AI calls.</span>
+<button type="submit" class="{{ btn }} bg-[#18201B] text-white hover:bg-primary">{{ 'Try again' if st == 'error' else 'Start learning' }}</button>
+</form>
+{% endif %}
+</section>
+
+{% if S.get('study') %}
+{% set sd = S.study %}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-space-md">
+<section class="{{ card }}">
+<h2 class="font-section-title text-section-title text-primary">What it measured on your labeled photos</h2>
+<ul class="font-body-default text-body-default flex flex-col gap-1">
+<li>{{ sd.n_crop }} crop plants and {{ sd.n_weed }} weed plants labeled by you.</li>
+<li>Crop grows as <b>{{ sd.crop_layout }}</b>{% if sd.band_width_px %}; crop band about <b>{{ sd.band_width_px|round(0)|int }} px</b> wide (95% of crop inside){% endif %}.</li>
+<li>Size: crop median {{ sd.sizes.crop.median|int if sd.sizes.crop.median else '—' }} px, weeds median {{ sd.sizes.weed.median|int if sd.sizes.weed.median else '—' }} px.</li>
+{% if sd.weeds_outside_band_pct is not none %}<li>{{ sd.weeds_outside_band_pct }}% of weeds grow outside the crop band.</li>{% endif %}
+</ul>
+<table class="w-full font-caption text-caption">
+<thead><tr class="text-left text-on-surface-variant"><th class="py-1">Feature</th><th>Best single split</th><th>Separates</th></tr></thead>
+<tbody>
+{% for f, t in sd.thresholds.items() %}
+<tr class="border-t border-[#DDE2DC]{% if t.balanced_accuracy < 0.65 %} text-on-surface-variant{% endif %}">
+<td class="py-1">{{ f }}</td><td>crop if {{ '≥' if t.crop_is == 'above' else '<' }} {{ t.threshold }}</td><td>{{ (100 * t.balanced_accuracy)|round(0)|int }}%{% if t.balanced_accuracy < 0.65 %} (weak, not used){% endif %}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+<p class="font-caption text-caption text-on-surface-variant">50% = no better than a coin. Position in the row is used only by a separate geometry check, never as a checklist rule.</p>
+</section>
+<section class="{{ card }}">
+<h2 class="font-section-title text-section-title text-primary">Example plants shown to the AI</h2>
+{% for lab in ('crop', 'weed') %}
+<div>
+<div class="font-label-instrument text-label-instrument {{ 'text-[#1e6e3c]' if lab == 'crop' else 'text-[#a32e1b]' }} mb-1">{{ lab|upper }} ({{ (S.get('refs') or {}).get(lab, [])|length }})</div>
+<div class="flex flex-wrap gap-2">
+{% for r in (S.get('refs') or {}).get(lab, []) %}
+<img src="/setup_img/{{ field }}/{{ r.file.split(field ~ '/', 1)[1] }}?w=160" alt="{{ lab }} example from {{ r.photo }}" title="{{ r.photo }} #{{ r.id }}" class="w-20 h-20 object-cover rounded border-2 {{ 'border-[#2E9E5B]' if lab == 'crop' else 'border-[#D2452B]' }}"/>
+{% else %}<span class="font-caption text-caption text-on-surface-variant">none found</span>{% endfor %}
+</div>
+</div>
+{% endfor %}
+</section>
+</div>
+{% endif %}
+
+{% if S.get('versions') %}
+<section class="{{ card }}">
+<h2 class="font-section-title text-section-title text-primary">Checklist versions</h2>
+<p class="font-caption text-caption text-on-surface-variant">Score on your labeled photos: {{ S.get('loo_note', '') }}</p>
+{% for v in S.versions|reverse %}
+{% set lo = v.loo %}
+<details data-key="v{{ v.v }}" class="border border-[#DDE2DC] rounded" {{ 'open' if v.v == S.get('active_version') }}>
+<summary class="cursor-pointer p-space-sm flex flex-wrap items-center gap-x-space-sm gap-y-1 min-h-[48px]">
+<b class="font-body-strong">v{{ v.v }}</b>
+<span class="font-caption text-caption text-on-surface-variant">{{ {'study': 'from your labels', 'review': 'after AI review', 'farmer': 'from your fixes'}.get(v.source, v.source) }}</span>
+{% if v.v == S.get('active_version') %}<span class="px-1.5 rounded bg-[#2E9E5B]/15 text-[#1e6e3c] font-label-instrument text-[11px]">IN USE</span>{% endif %}
+{% if v.v == S.get('best_version') %}<span class="px-1.5 rounded bg-secondary/10 text-secondary font-label-instrument text-[11px]">BEST SCORE</span>{% endif %}
+{% if v.source == 'farmer' and not v.get('activated') %}<span class="px-1.5 rounded bg-[#D2452B]/10 text-[#a32e1b] font-label-instrument text-[11px]">NOT USED: SCORED WORSE</span>{% endif %}
+<span class="ml-auto font-metric-inline text-caption {{ 'text-[#a32e1b]' if lo.crop_hits else 'text-[#1e6e3c]' }}">{{ lo.crop_hits }} crop hit{{ '' if lo.crop_hits == 1 else 's' }}</span>
+<span class="font-metric-inline text-caption">weeds {{ lo.weeds_hit }}/{{ lo.weeds }}</span>
+<span class="font-metric-inline text-caption">labels {{ lo.accuracy_pct|round(0)|int }}% right</span>
+</summary>
+<div class="px-space-sm pb-space-sm flex flex-col gap-2">
+<p class="font-caption text-caption text-on-surface-variant">{{ v.what_changed }}</p>
+<p class="font-body-default text-body-default whitespace-pre-line border-l-2 border-secondary pl-2">{{ v.checklist }}</p>
+</div>
+</details>
+{% endfor %}
+</section>
+{% endif %}
+
+{% if S.get('rounds') %}
+<section class="{{ card }}">
+<h2 class="font-section-title text-section-title text-primary">Rounds on your {{ test_photos|length }} other photos</h2>
+{% for r in S.rounds|reverse %}
+<details data-key="r{{ r.round }}" class="border border-[#DDE2DC] rounded" {{ 'open' if loop.first }}>
+<summary class="cursor-pointer p-space-sm flex flex-wrap items-center gap-x-space-sm gap-y-1 min-h-[48px]">
+<b class="font-body-strong">Round {{ r.round }}</b>
+<span class="font-caption text-caption">checklist v{{ r.version }}</span>
+<span class="font-caption text-caption">{{ '—' if r.labels_changed is none else r.labels_changed ~ ' labels changed' }}</span>
+<span class="font-caption text-caption text-on-surface-variant">{{ r.flags }} unsure · {{ r.disagreements }} geometry disagreements</span>
+<span class="ml-auto font-metric-inline text-caption text-on-surface-variant">${{ '%.3f'|format(r.usd) }}</span>
+</summary>
+<div class="px-space-sm pb-space-sm flex flex-col gap-2">
+{% if r.get('stop') %}<p class="font-caption text-caption">{{ r.stop }}</p>{% endif %}
+{% if r.get('review_summary') %}<p class="font-caption text-caption text-on-surface-variant">AI review: {{ r.review_summary }}</p>{% endif %}
+{% if r.get('suspects') %}
+<ul class="font-caption text-caption flex flex-col gap-0.5">
+{% for s in r.suspects %}<li>{{ s.photo }} #{{ s.id }}: {{ s.now }} → <b>{{ s.should_be }}</b> ({{ s.rule }})</li>{% endfor %}
+</ul>
+{% endif %}
+<div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+{% for ov in r.overlays %}
+{% set sub = ov.split(field ~ '/', 1)[1] %}
+<a href="/setup_img/{{ field }}/{{ sub }}?w=1600" target="_blank" rel="noopener" class="block border border-[#DDE2DC] rounded overflow-hidden">
+<img src="/setup_img/{{ field }}/{{ sub }}?w=360" alt="round {{ r.round }} {{ r.photos[loop.index0].name }}" class="w-full aspect-[4/3] object-cover"/>
+<span class="block px-1 font-metric-inline text-[11px] text-on-surface-variant truncate">{{ r.photos[loop.index0].name }} · {{ r.photos[loop.index0].spray }} spray</span>
+</a>
+{% endfor %}
+</div>
+</div>
+</details>
+{% endfor %}
+</section>
+{% endif %}
+
+{% if S.get('disagreements') %}
+<section class="{{ card }}">
+<details data-key="dis">
+<summary class="cursor-pointer font-section-title text-section-title text-primary min-h-[44px] flex items-center">Geometry vs AI disagreements ({{ S.disagreements|length }})</summary>
+<p class="font-caption text-caption text-on-surface-variant mt-1">Plants far outside the crop band and touching nothing, which the AI did not call weed. Geometry never sprays these on its own.</p>
+<table class="w-full font-caption text-caption mt-2">
+<thead><tr class="text-left text-on-surface-variant"><th class="py-1">Round</th><th>Photo</th><th>Plant</th><th>AI said</th><th>Reason</th></tr></thead>
+<tbody>
+{% for d in S.disagreements %}<tr class="border-t border-[#DDE2DC]"><td class="py-1">{{ d.round }}</td><td>{{ d.photo }}</td><td>#{{ d.id }}</td><td>{{ d.spark_label }} {{ d.confidence }}</td><td>{{ d.reason }}</td></tr>{% endfor %}
+</tbody>
+</table>
+</details>
+</section>
+{% endif %}
+</div>

@@ -1,0 +1,22 @@
+# Raspberry Pi 4 (Raspberry Pi OS, Python 3.11). Install into a venv created with
+#   python3 -m venv --system-site-packages .venv
+# OpenCV, picamera2 and lgpio/pigpio come from apt (see docs/START_HERE_PI.md).
+openai
+pillow
+numpy
+python-dotenv
+meta-sam-parser
+flask
+
+# Optional, large: only for YOLO inference on the Pi (not needed for the SAM + Muse mode).
+# Install torch from the CPU index first (avoids a multi-GB CUDA build), then ultralytics:
+#   uv pip install --index-url https://download.pytorch.org/whl/cpu torch==2.15.0 torchvision==0.29.2
+# then reinstall opencv-python-headless (ultralytics pulls opencv-python, which clashes with it).
+ultralytics
+
+# The robot (tools/hardware.py PiHardware, tools/phone_cam.py phone camera).
+pigpio
+fastapi
+uvicorn
+websockets
+segno

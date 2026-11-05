@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder — Crops</title>
+<!-- Typography: IBM Plex Sans & JetBrains Mono / IBM Plex Mono -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined (Literal Rule) -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS v3 with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Theme Configuration Verbatim from Design System -->
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary": "#066c41",
+            "on-secondary-container": "#107145",
+            "on-error-container": "#93000a",
+            "tertiary": "#000602",
+            "on-tertiary-container": "#279856",
+            "on-tertiary": "#ffffff",
+            "on-secondary-fixed": "#002110",
+            "background": "#f2fcf3",
+            "secondary-container": "#9bf2bb",
+            "tertiary-fixed-dim": "#71dc92",
+            "on-tertiary-fixed": "#00210d",
+            "on-primary-fixed-variant": "#404943",
+            "primary-fixed-dim": "#c0c9c1",
+            "error": "#ba1a1a",
+            "on-background": "#141e18",
+            "surface-tint": "#58605a",
+            "on-error": "#ffffff",
+            "on-surface": "#141e18",
+            "surface-bright": "#f2fcf3",
+            "surface-container-lowest": "#ffffff",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed": "#151d18",
+            "primary-fixed": "#dce5dc",
+            "on-secondary-fixed-variant": "#00522f",
+            "inverse-surface": "#29332d",
+            "inverse-on-surface": "#e9f3ea",
+            "error-container": "#ffdad6",
+            "surface-container-high": "#e0ebe2",
+            "primary-container": "#18201b",
+            "primary": "#020603",
+            "surface-container": "#e6f1e7",
+            "secondary-fixed": "#9ef5be",
+            "on-secondary": "#ffffff",
+            "surface": "#f2fcf3",
+            "tertiary-container": "#00240e",
+            "outline": "#747874",
+            "surface-container-low": "#ecf6ed",
+            "tertiary-fixed": "#8df9ac",
+            "on-tertiary-fixed-variant": "#005229",
+            "inverse-primary": "#c0c9c1",
+            "on-surface-variant": "#434844",
+            "surface-variant": "#dbe5dc",
+            "outline-variant": "#c4c8c2",
+            "surface-dim": "#d2ddd4",
+            "surface-container-highest": "#dbe5dc",
+            "on-primary": "#ffffff",
+            "secondary-fixed-dim": "#82d8a3"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "space-sm": "0.75rem",
+            "space-2xs": "0.25rem",
+            "gutter-tablet": "1.25rem",
+            "gutter": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-desktop": "2rem",
+            "margin": "1rem",
+            "space-lg": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "space-xl": "2rem",
+            "space-2xl": "3rem",
+            "space-md": "1rem",
+            "space-xs": "0.5rem"
+          },
+          "fontFamily": {
+            "metric-display-mobile": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "section-title": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "body-strong": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "page-title": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "metric-display-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "body-default": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "caption": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "metric-inline": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "section-title": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "body-strong": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "page-title-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "label-instrument": ["12px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "page-title": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    /* Strict AgTech hairline outline rules - strictly no ambient box shadows or glass effects */
+    * {
+      box-shadow: none !important;
+      text-shadow: none !important;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+      height: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c4c8c2;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f2fcf3;
+    }
+  </style>
+</head>
+<body class="bg-[#F5F6F3] text-on-surface font-body-default text-body-default min-h-screen flex flex-col antialiased selection:bg-secondary-container selection:text-on-secondary-fixed">
+{% include '_nav.html' %}
+<!-- ========================================================================= -->
+<!-- 1. TOP APP BAR (Shared Components JSON Anchor & Execution)                 -->
+<!-- ========================================================================= -->
+<header class="bg-surface-container-lowest border-b border-outline-variant w-full sticky top-0 z-50">
+<div class="max-w-[1440px] mx-auto px-gutter-desktop py-space-sm flex justify-between items-center">
+<!-- Left: Brand Anchor & Coordinates -->
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 bg-primary-container text-on-primary rounded flex items-center justify-center font-metric-inline font-bold text-sm tracking-tighter">
+            OW
+          </div>
+<div>
+<span class="font-section-title text-section-title font-semibold text-primary tracking-tight block leading-tight">OpenWeeder</span>
+
+</div>
+</div>
+<!-- Global Context Divider -->
+</div>
+<!-- Right: Action & Telemetry status cluster -->
+<div class="flex items-center gap-space-sm">
+<!-- Language Switcher from JSON -->
+
+<!-- Calibrate Secondary Action -->
+
+<!-- New crop CTA (Primary Action as requested) -->
+<a class="bg-[#18201B] hover:bg-[#252f28] text-white px-space-md py-1.5 rounded flex items-center gap-1.5 text-label-instrument font-label-instrument font-semibold tracking-wide transition-colors" href="/crop/new">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span>+ New crop</span>
+</a>
+</div>
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- 2. MAIN WORKSPACE CANVAS (1440px Centered Desktop Grid)                    -->
+<!-- ========================================================================= -->
+<main class="flex-1 w-full max-w-[1440px] mx-auto px-gutter-desktop py-space-lg space-y-space-lg">
+<!-- SUMMARY METRICS (all computed from fields/) -->
+<section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="bg-surface-container-lowest border border-outline-variant p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs border-b border-[#F0F3EF]">
+<span class="font-label-instrument text-[11px] uppercase tracking-wider text-on-surface-variant">Crops</span>
+<span class="font-metric-inline text-[11px] text-on-surface-variant">{{ fields|selectattr('phase', 'equalto', 'ready')|list|length }} confirmed</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-metric-display text-metric-display text-primary tracking-tight">{{ fields|length }}</div>
+<div class="font-label-instrument text-label-instrument text-on-surface-variant mt-1">FIELDS SET UP</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs border-b border-[#F0F3EF]">
+<span class="font-label-instrument text-[11px] uppercase tracking-wider text-on-surface-variant">Labeling</span>
+<span class="font-metric-inline text-[11px] text-on-surface-variant">{{ fields|sum(attribute='changed') }} plants fixed</span>
+</div>
+<div class="mt-space-sm">
+<div class="font-metric-display text-metric-display text-primary tracking-tight">{{ fields|sum(attribute='labeled') }}</div>
+<div class="font-label-instrument text-label-instrument text-on-surface-variant mt-1">PHOTOS LABELED BY YOU</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs border-b border-[#F0F3EF]">
+<span class="font-label-instrument text-[11px] uppercase tracking-wider text-on-surface-variant">Test runs</span>
+
+</div>
+<div class="mt-space-sm">
+<div class="font-metric-display text-metric-display text-primary tracking-tight">{{ fields|sum(attribute='rounds') }}</div>
+<div class="font-label-instrument text-label-instrument text-on-surface-variant mt-1">AI TEST ROUNDS RUN</div>
+</div>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant p-space-md rounded flex flex-col justify-between">
+<div class="flex items-center justify-between pb-space-xs border-b border-[#F0F3EF]">
+<span class="font-label-instrument text-[11px] uppercase tracking-wider text-on-surface-variant">AI checks</span>
+
+</div>
+<div class="mt-space-sm">
+<div class="font-metric-display text-metric-display text-primary tracking-tight">{{ fields|sum(attribute='plants') }}</div>
+<div class="font-label-instrument text-label-instrument text-on-surface-variant mt-1">PLANTS JUDGED IN LATEST ROUNDS</div>
+</div>
+</div>
+</section>
+<!-- MAIN TWO-COLUMN WORKSPACE (7 Col / 5 Col Asymmetric Split on Desktop) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+<!-- ===================================================================== -->
+<!-- LEFT COLUMN: Fields (Active projects)                                  -->
+<!-- ===================================================================== -->
+<section id="crops" class="lg:col-span-7 space-y-4">
+<!-- Section Header with Count & Inline Filter Tabs -->
+<div class="bg-surface-container-lowest border border-outline-variant px-space-md py-space-sm rounded flex flex-wrap justify-between items-center gap-3">
+<div class="flex items-center gap-2">
+<h2 class="font-section-title text-section-title text-primary tracking-tight">Crops</h2>
+<span class="bg-surface-container-low text-primary px-2 py-0.5 rounded font-metric-inline text-xs font-semibold">{{ fields|length }} total</span>
+</div>
+<!-- Strict Industrial Filters -->
+<div class="flex items-center border border-outline-variant rounded p-0.5 bg-surface-container-lowest text-xs font-label-instrument">
+{% for key, lab in [('all', 'All'), ('running', 'Running'), ('ready', 'Ready'), ('learning', 'Learning')] %}
+<button type="button" data-filter="{{ key }}" class="field-filter px-2.5 py-1 rounded min-h-[32px] {{ 'bg-[#18201B] text-white font-medium' if key == 'all' else 'text-on-surface-variant hover:text-on-surface' }}">{{ lab }} <span class="opacity-70">{{ fields|length if key == 'all' else fields|selectattr('phase', 'equalto', key)|list|length }}</span></button>
+{% endfor %}
+</div>
+</div>
+<p id="filter-empty" class="hidden text-body-default font-body-default text-on-surface-variant border border-dashed border-outline-variant rounded p-space-md">No crops in this state.</p>
+{% for f in fields %}
+<!-- Field Card -->
+<article data-phase="{{ f.phase }}" class="field-card bg-surface-container-lowest border border-outline-variant rounded p-space-md space-y-space-md">
+<!-- Card Header & Status -->
+<div class="flex justify-between items-start pb-space-xs border-b border-outline-variant">
+<div>
+<div class="flex items-center gap-2">
+<h3 class="font-section-title text-section-title text-primary tracking-tight">{{ f.name }}</h3>
+<span class="font-metric-inline text-xs text-on-surface-variant">#{{ f.code }}</span>
+</div>
+<p class="font-caption text-caption text-on-surface-variant mt-0.5">{{ f.crop }}{% if f.style %} · {{ f.style }}{% endif %}</p>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-outline-variant bg-surface-container-lowest">
+{% if f.status == 'Labeled' %}<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>
+{% elif f.status == 'Labeling' %}<span class="w-2 h-2 rounded-full bg-[#E3A21A]"></span>
+{% else %}<span class="w-2 h-2 rounded-full bg-[#747874]"></span>{% endif %}
+<span class="font-label-instrument text-label-instrument text-primary">{{ f.status }}</span>
+</div>
+</div>
+<!-- Telemetry Grid -->
+<div class="grid grid-cols-3 gap-2 py-1">
+<div class="p-2 border border-outline-variant rounded bg-surface-container-low">
+<div class="font-label-instrument text-[11px] text-on-surface-variant uppercase">Photos</div>
+<div class="font-metric-inline text-metric-inline font-bold text-primary mt-1">{{ f.photos }}</div>
+</div>
+<div class="p-2 border border-outline-variant rounded bg-surface-container-low">
+<div class="font-label-instrument text-[11px] text-on-surface-variant uppercase">Labeled</div>
+<div class="font-metric-inline text-metric-inline font-semibold text-primary mt-1">{{ f.labeled }} / {{ f.n_label }}</div>
+</div>
+<div class="p-2 border border-outline-variant rounded bg-surface-container-low">
+<div class="font-label-instrument text-[11px] text-on-surface-variant uppercase">Farmer fixes</div>
+<div class="font-metric-inline text-metric-inline font-semibold text-primary mt-1">{{ f.changed }}</div>
+</div>
+</div>
+<!-- Micro Optical Telemetry Preview Strip -->
+<div class="border border-outline-variant rounded p-space-xs bg-[#F5F6F3] flex items-center justify-between text-xs font-metric-inline">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-secondary" data-icon="center_focus_strong">center_focus_strong</span>
+<span class="text-on-surface-variant">{{ f.labeled }} of {{ f.photos }} photos labeled</span>
+</div>
+<span class="text-primary font-semibold">{{ f.next_label }}</span>
+</div>
+<!-- Actions -->
+<div class="flex items-center justify-end gap-2 pt-2 border-t border-outline-variant">
+<a class="px-3 py-1.5 border border-outline-variant hover:bg-surface-container text-primary rounded font-label-instrument text-label-instrument transition-colors" href="/field/{{ f.name }}">
+              View Field
+            </a>
+<a class="px-4 py-1.5 bg-[#18201B] hover:bg-[#252f28] text-white rounded font-label-instrument text-label-instrument font-semibold flex items-center gap-1.5 transition-colors" href="{{ f.next_url }}">
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              Continue setup
+            </a>
+</div>
+</article>
+{% else %}
+<article class="bg-surface-container-lowest border border-outline-variant rounded p-space-md space-y-space-md">
+<div class="flex justify-between items-center">
+<div>
+<h3 class="font-section-title text-section-title text-primary tracking-tight">No crops yet</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-0.5">Set up your first field to start.</p>
+</div>
+<a class="px-4 py-1.5 bg-[#18201B] hover:bg-[#252f28] text-white rounded font-label-instrument text-label-instrument font-semibold flex items-center gap-1.5 transition-colors" href="/crop/new">
+<span class="material-symbols-outlined text-[16px]">add</span>
+              New crop
+            </a>
+</div>
+</article>
+{% endfor %}
+</section>
+<!-- ===================================================================== -->
+<!-- RIGHT COLUMN: Trained crops (Agronomic models)                         -->
+<!-- ===================================================================== -->
+<section id="refs" class="lg:col-span-5 space-y-4">
+<!-- Section Header with Model Count -->
+<div class="bg-surface-container-lowest border border-outline-variant px-space-md py-space-sm rounded flex justify-between items-center">
+<div class="flex items-center gap-2">
+<h2 class="font-section-title text-section-title text-primary tracking-tight">Reference photos by crop</h2>
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant" data-icon="psychiatry">psychiatry</span>
+</div>
+<span class="font-metric-inline text-xs text-on-surface-variant">{{ crops|length }} crop{{ 's' if crops|length != 1 }}</span>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded p-space-sm">
+<a href="/crop/new" class="flex items-center justify-center gap-1.5 px-4 py-2 bg-[#18201B] hover:bg-[#252f28] text-white rounded font-label-instrument text-label-instrument font-semibold transition-colors">+ New crop</a>
+</div>
+{% for c in crops %}
+<!-- Crop Model -->
+<article class="bg-surface-container-lowest border border-outline-variant rounded p-space-md space-y-space-sm">
+<div class="flex justify-between items-start border-b border-outline-variant pb-2">
+<div>
+<h3 class="font-section-title text-[16px] text-primary tracking-tight leading-tight"><a class="hover:underline" href="/crop/{{ c.name }}">{{ c.name }}</a></h3>
+</div>
+<div class="text-right">
+<span class="font-metric-inline text-metric-inline font-bold text-secondary">{{ c.n_refs }}</span>
+<span class="block font-label-instrument text-[10px] text-on-surface-variant uppercase">Reference plants</span>
+</div>
+</div>
+<div class="space-y-1.5 text-xs">
+<div class="flex justify-between font-caption text-on-surface-variant">
+<span>Crops learned from:</span>
+<span class="font-body-strong text-primary">{{ c.fields_text }}</span>
+</div>
+<div class="p-2 border border-outline-variant rounded bg-[#F5F6F3]">
+<div class="font-label-instrument text-[11px] text-on-surface-variant uppercase mb-1">Reference plants ({{ c.n_refs }}):</div>
+{% if c.thumbs %}
+<div class="flex flex-wrap gap-1.5">
+{% for t in c.thumbs %}<img src="/cref/{{ c.name }}/{{ t }}" class="w-14 h-14 object-cover rounded border border-outline-variant" loading="lazy">{% endfor %}
+</div>
+{% else %}
+<div class="font-caption text-caption text-on-surface-variant">No references yet — label photos to train.</div>
+{% endif %}
+</div>
+</div>
+</article>
+{% else %}
+<article class="bg-surface-container-lowest border border-outline-variant rounded p-space-md">
+<h3 class="font-section-title text-[16px] text-primary tracking-tight leading-tight">No crops trained yet</h3>
+<p class="font-caption text-caption text-on-surface-variant mt-0.5">Name a crop above, then label its photos.</p>
+</article>
+{% endfor %}
+</section>
+</div>
+</main>
+<script>
+const filters = [...document.querySelectorAll('.field-filter')];
+const ON = ['bg-[#18201B]', 'text-white', 'font-medium'];
+const OFF = ['text-on-surface-variant', 'hover:text-on-surface'];
+filters.forEach(b => b.addEventListener('click', () => {
+  filters.forEach(x => {
+    const on = x === b;
+    ON.forEach(c => x.classList.toggle(c, on));
+    OFF.forEach(c => x.classList.toggle(c, !on));
+  });
+  let shown = 0;
+  document.querySelectorAll('.field-card').forEach(card => {
+    const show = b.dataset.filter === 'all' || card.dataset.phase === b.dataset.filter;
+    card.classList.toggle('hidden', !show);
+    shown += show;
+  });
+  document.getElementById('filter-empty').classList.toggle('hidden', shown > 0);
+}));
+</script>
+</body></html>

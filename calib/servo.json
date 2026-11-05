@@ -1,0 +1,8 @@
+{
+  "placeholder": true,
+  "note": "center_trim_deg: add to 90 so the nozzle points straight down. sign: +1 or -1 if a servo turns the wrong way. max_reach_deg: farthest angle off center the nozzle may be asked to go.",
+  "pan": {"center_trim_deg": 0, "sign": 1},
+  "tilt": {"center_trim_deg": 0, "sign": 1},
+  "arm": {"center_trim_deg": 0, "sign": 1, "max_deg": 80, "park_deg": 70},
+  "max_reach_deg": 45
+}

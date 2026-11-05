@@ -1,0 +1,197 @@
+{% set title = 'OpenWeeder — Fix Labels' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+<a href="/field/{{ field }}/results" class="hover:text-primary">Results</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-body-strong">Fix {{ name }}</span>
+</nav>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded px-space-xs py-space-2xs flex items-center gap-space-2xs">
+<span class="w-1.5 h-1.5 rounded-full bg-[#E3A21A]"></span>
+<span class="text-label-instrument font-label-instrument text-on-surface tracking-wider">ROUND {{ round_no }}</span>
+</div>
+</header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-md flex-1 flex flex-col gap-space-md">
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded p-space-md">
+<h1 class="font-section-title text-section-title text-primary">Fix the wrong plants</h1>
+<p class="font-body-default text-body-default text-on-surface-variant mt-1">Tap a plant <b>on the photo or below</b> to cycle <b>crop → weed → skip</b>. Every change saves by itself. Tell the AI <b>why</b> in the note under a changed plant: your fixes and notes teach the next run.</p>
+</section>
+<div class="flex items-center justify-between gap-2 flex-wrap">
+<div class="flex items-center gap-3 text-label-instrument font-label-instrument text-on-surface-variant">
+<span class="flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-[#2E9E5B] bg-[#2E9E5B]/30"></span>CROP</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-[#D2452B] bg-[#D2452B]/30"></span>WEED</span>
+<span class="flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-[#E3A21A] bg-[#E3A21A]/30"></span>SKIP</span>
+</div>
+<button id="view-toggle" type="button" class="px-space-sm py-1.5 rounded border border-outline-variant bg-surface-container-lowest text-label-instrument font-label-instrument text-primary hover:bg-surface-container min-h-[40px]">Show AI overlay</button>
+</div>
+<div class="relative rounded border border-[#DDE2DC] overflow-hidden select-none">
+<img id="fix-img" src="/p/{{ field }}/{{ photo_file }}" data-photo="/p/{{ field }}/{{ photo_file }}" data-overlay="/run_overlay/{{ field }}/{{ name }}" alt="{{ name }}" class="w-full block"/>
+<div id="pboxes">
+{% for o in objects|sort(attribute='area', reverse=True) %}
+<div class="pbox" data-id="{{ o.id }}" data-label="{{ o.label }}" style="left:{{ o.l }}%;top:{{ o.t }}%;width:{{ o.w }}%;height:{{ o.h }}%"><span>#{{ o.id }} <b>{{ o.label }}</b></span></div>
+{% endfor %}
+</div>
+</div>
+<style>
+.plant{border:2px solid #747874;border-radius:.5rem;background:#fff;display:flex;flex-direction:column;overflow:hidden}
+.chip{padding:.5rem;display:flex;flex-direction:column;align-items:center;gap:2px;min-height:76px;justify-content:center;width:100%}
+.chip .num{font-family:'JetBrains Mono',monospace;font-size:12px;color:#434844}
+.chip .lab{font-weight:700;text-transform:uppercase;font-size:15px;letter-spacing:.04em}
+.chip .ai{font-size:12px;color:#747874}
+.plant[data-label=crop]{border-color:#2E9E5B;background:#2E9E5B14}
+.plant[data-label=crop] .lab{color:#1e6e3c}
+.plant[data-label=weed]{border-color:#D2452B;background:#D2452B14}
+.plant[data-label=weed] .lab{color:#a32e1b}
+.plant[data-label=skip],.plant[data-label=unsure]{border-color:#E3A21A;background:#E3A21A14}
+.plant[data-label=skip] .lab,.plant[data-label=unsure] .lab{color:#8a5b00}
+.plant.changed{box-shadow:0 0 0 2px #18201B}
+.plant .why{display:none;border:0;border-top:1px solid #DDE2DC;background:#fff;font-size:13px;padding:.5rem;width:100%;min-height:40px}
+.plant .why:focus{outline:2px solid #066c41;outline-offset:-2px}
+.plant.changed .why,.plant.noted .why{display:block}
+.pbox{position:absolute;border:3px solid #E3A21A;background:#E3A21A26;border-radius:4px;cursor:pointer;touch-action:manipulation;transition:background-color .15s,border-color .15s}
+.pbox:hover{background-color:#ffffff33}
+.pbox>span{position:absolute;top:2px;left:2px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;color:#fff;background:#E3A21A;padding:1px 6px;border-radius:3px;white-space:nowrap;pointer-events:none}
+.pbox>span b{text-transform:uppercase}
+.pbox[data-label=crop]{border-color:#2E9E5B;background-color:#2E9E5B33}
+.pbox[data-label=crop]>span{background:#2E9E5B}
+.pbox[data-label=weed]{border-color:#D2452B;background-color:#D2452B33}
+.pbox[data-label=weed]>span{background:#D2452B}
+.pbox[data-label=skip],.pbox[data-label=unsure]{border-color:#E3A21A}
+.pbox.changed{box-shadow:0 0 0 2px #fff,0 0 0 4px #18201B}
+.pbox.flash{animation:pflash .35s ease}
+@keyframes pflash{0%{transform:scale(1.04)}100%{transform:scale(1)}}
+#pboxes.hide .pbox{display:none}
+</style>
+<section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-space-sm">
+{% for o in objects %}
+<div class="plant{% if o.note %} noted{% endif %}" data-id="{{ o.id }}" data-ai="{{ o.ai }}" data-label="{{ o.label }}">
+<button type="button" class="chip">
+<span class="num">#{{ o.id }}</span>
+<span class="lab">{{ o.label }}</span>
+<span class="ai">AI: {{ o.ai }}{% if o.conf %} {{ o.conf }}{% endif %}</span>
+</button>
+<input class="why" type="text" maxlength="300" placeholder="Why? e.g. purslane, thick round leaves" value="{{ o.note }}" aria-label="Note for plant {{ o.id }}"/>
+</div>
+{% endfor %}
+</section>
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded p-space-md flex flex-col gap-2">
+<label for="photo-note" class="font-body-strong text-body-strong text-primary">Note about this photo (optional)</label>
+<textarea id="photo-note" rows="2" maxlength="1000" class="border border-outline-variant rounded p-2 text-body-default font-body-default focus:border-secondary focus:ring-0" placeholder="e.g. Grass blades crossing the carrots are weeds; don't count the carrot under them.">{{ photo_note }}</textarea>
+<p class="text-caption font-caption text-on-surface-variant">The AI reads your notes on every run of this field, together with your fixed plants.</p>
+</section>
+</main>
+<div class="sticky bottom-0 w-full bg-surface-container-lowest border-t border-[#DDE2DC] px-4 py-space-sm flex items-center justify-between gap-space-sm flex-wrap">
+<div class="flex flex-col">
+<span id="fixed-count" class="font-body-strong text-body-strong text-primary">Tap a plant to fix it</span>
+<span id="save-state" class="text-caption font-caption text-on-surface-variant">All changes saved</span>
+</div>
+<div class="flex items-center gap-space-sm">
+<a id="back" class="px-space-md py-2.5 rounded border border-outline-variant text-primary text-label-instrument font-label-instrument hover:bg-surface-container transition-colors flex items-center min-h-[48px]" href="/field/{{ field }}/results">Back to results</a>
+<button id="save" type="button" class="px-space-lg py-2.5 rounded bg-[#18201B] text-white text-label-instrument font-label-instrument hover:bg-primary transition-colors min-h-[48px]">Done</button>
+</div>
+</div>
+<script>
+const ORDER = ['crop', 'weed', 'skip'];
+const RESULTS = '/field/{{ field }}/results';
+const plants = [...document.querySelectorAll('.plant')];
+const boxes = [...document.querySelectorAll('.pbox')];
+const byId = {};
+plants.forEach(p => { byId[p.dataset.id] = {plant: p, box: null, ai: p.dataset.ai}; });
+boxes.forEach(b => { if (byId[b.dataset.id]) byId[b.dataset.id].box = b; });
+const stateEl = document.getElementById('save-state');
+function paint(id) {
+  const s = byId[id];
+  const lab = s.plant.dataset.label;
+  if (s.box) {
+    s.box.dataset.label = lab;
+    s.box.querySelector('b').textContent = lab;
+  }
+  const changed = lab !== s.ai;
+  s.plant.classList.toggle('changed', changed);
+  if (s.box) s.box.classList.toggle('changed', changed);
+  s.plant.querySelector('.lab').textContent = lab;
+}
+function refresh() {
+  let n = 0;
+  Object.keys(byId).forEach(id => {
+    paint(id);
+    if (byId[id].plant.dataset.label !== byId[id].ai) n++;
+  });
+  document.getElementById('fixed-count').textContent =
+    n ? `You fixed ${n} plant${n > 1 ? 's' : ''}` : 'Tap a plant to fix it';
+}
+function payload() {
+  const labels = {}, plant_notes = {};
+  Object.keys(byId).forEach(id => {
+    const s = byId[id];
+    if (s.plant.dataset.label !== s.ai) labels[id] = s.plant.dataset.label;
+    const note = s.plant.querySelector('.why').value.trim();
+    if (note) plant_notes[id] = note;
+  });
+  return {labels, plant_notes,
+          photo_note: document.getElementById('photo-note').value.trim()};
+}
+let timer = null, saving = null, dirty = false;
+async function saveNow() {
+  clearTimeout(timer);
+  if (!dirty) return saving;
+  dirty = false;
+  stateEl.textContent = 'Saving…';
+  saving = fetch(location.pathname, {
+    method: 'POST', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload())
+  }).then(r => r.json()).then(j => {
+    stateEl.textContent = j.ok
+      ? (dirty ? 'Saving…' : `All changes saved · ${j.teach} will teach the next run`)
+      : 'Save failed — check the connection';
+    return j;
+  }).catch(() => { dirty = true; stateEl.textContent = 'Not saved — retrying…'; timer = setTimeout(saveNow, 3000); });
+  return saving;
+}
+function queueSave(delay) {
+  dirty = true;
+  stateEl.textContent = 'Saving…';
+  clearTimeout(timer);
+  timer = setTimeout(saveNow, delay);
+}
+function cycle(id) {
+  const p = byId[id].plant;
+  p.dataset.label = ORDER[(ORDER.indexOf(p.dataset.label) + 1) % 3];
+  refresh();
+  const b = byId[id].box;
+  if (b) { b.classList.remove('flash'); void b.offsetWidth; b.classList.add('flash'); }
+  queueSave(300);
+}
+plants.forEach(p => p.querySelector('.chip').addEventListener('click', () => cycle(p.dataset.id)));
+boxes.forEach(b => b.addEventListener('click', () => cycle(b.dataset.id)));
+plants.forEach(p => p.querySelector('.why').addEventListener('input', () => {
+  p.classList.toggle('noted', !!p.querySelector('.why').value.trim());
+  queueSave(800);
+}));
+document.getElementById('photo-note').addEventListener('input', () => queueSave(800));
+const img = document.getElementById('fix-img');
+const toggle = document.getElementById('view-toggle');
+toggle.addEventListener('click', () => {
+  const ai = img.src.endsWith(img.dataset.photo);
+  img.src = ai ? img.dataset.overlay : img.dataset.photo;
+  document.getElementById('pboxes').classList.toggle('hide', ai);
+  toggle.textContent = ai ? 'Back to editing' : 'Show AI overlay';
+});
+async function leave(e) {
+  e.preventDefault();
+  await saveNow();
+  location.href = RESULTS;
+}
+document.getElementById('save').addEventListener('click', leave);
+document.getElementById('back').addEventListener('click', leave);
+window.addEventListener('beforeunload', e => { if (dirty) { saveNow(); e.preventDefault(); } });
+refresh();
+</script>
+</body></html>

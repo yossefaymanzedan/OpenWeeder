@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder — Upload Photos</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols Outlined -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#020603",
+            "surface-bright": "#f2fcf3",
+            "primary-fixed": "#dce5dc",
+            "primary-container": "#18201b",
+            "inverse-surface": "#29332d",
+            "surface-container-low": "#ecf6ed",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#dbe5dc",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#279856",
+            "on-secondary-fixed": "#002110",
+            "tertiary-fixed": "#8df9ac",
+            "tertiary-container": "#00240e",
+            "on-primary-fixed": "#151d18",
+            "secondary-container": "#9bf2bb",
+            "on-secondary-fixed-variant": "#00522f",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed-variant": "#404943",
+            "secondary-fixed": "#9ef5be",
+            "tertiary": "#000602",
+            "on-surface": "#141e18",
+            "on-secondary": "#ffffff",
+            "background": "#f2fcf3",
+            "surface": "#f2fcf3",
+            "surface-tint": "#58605a",
+            "outline-variant": "#c4c8c2",
+            "outline": "#747874",
+            "primary-fixed-dim": "#c0c9c1",
+            "on-tertiary-fixed-variant": "#005229",
+            "surface-variant": "#dbe5dc",
+            "on-background": "#141e18",
+            "secondary": "#066c41",
+            "surface-container": "#e6f1e7",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#71dc92",
+            "inverse-primary": "#c0c9c1",
+            "on-tertiary-fixed": "#00210d",
+            "secondary-fixed-dim": "#82d8a3",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e0ebe2",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#e9f3ea",
+            "surface-dim": "#d2ddd4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#107145",
+            "on-surface-variant": "#434844"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "1.25rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.5rem",
+            "space-2xs": "0.25rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "section-title": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "body-strong": ["IBM Plex Sans"],
+            "metric-display-mobile": ["JetBrains Mono"],
+            "page-title": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "section-title": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "label-instrument": ["12px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "caption": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "metric-inline": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "body-default": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-strong": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "metric-display-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      vertical-align: middle;
+    }
+    .optical-reticle {
+      background-image: 
+        linear-gradient(to right, rgba(20, 30, 24, 0.08) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(20, 30, 24, 0.08) 1px, transparent 1px);
+      background-size: 16px 16px;
+    }
+  </style>
+</head>
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col justify-between selection:bg-secondary-container selection:text-on-secondary-fixed-variant">
+{% include '_nav.html' %}
+{% set P = field_plan(field if field is defined else None) %}
+<!-- TOP WORKFLOW BAR -->
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-md">
+<!-- System Identifier -->
+<div class="flex items-center gap-space-xs pr-space-md border-r border-[#DDE2DC]">
+<span class="material-symbols-outlined text-secondary">psychiatry</span>
+<span class="font-section-title text-section-title font-semibold text-primary tracking-tight">OpenWeeder</span>
+</div>
+<!-- Breadcrumb -->
+<nav class="flex items-center gap-space-2xs text-on-surface-variant font-caption text-caption">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span class="text-outline-variant">/</span>
+<a href="/field/{{ field }}" class="hover:text-primary">{{ field }}</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-body-strong">Upload &amp; Photo Selection</span>
+</nav>
+</div>
+<!-- Stepper & Bilingual Utility -->
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">Workflow</span>
+<span class="inline-flex items-center px-space-xs py-space-2xs bg-surface-container-low border border-[#DDE2DC] rounded font-metric-inline text-metric-inline text-secondary font-semibold">
+          Step 3 of 4
+        </span>
+</div>
+</div>
+</header>
+<!-- MAIN VIEWPORT CONTAINER (Desktop 1440px target) -->
+<main class="w-full max-w-[1440px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col justify-between">
+<!-- INSTRUCTION & TELEMETRY BANNER -->
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg mb-space-lg">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md border-b border-[#DDE2DC] pb-space-md">
+<div>
+<div class="flex items-center gap-space-xs mb-space-2xs">
+<span class="inline-block w-2.5 h-2.5 bg-secondary rounded-sm"></span>
+<span class="font-label-instrument text-label-instrument uppercase text-secondary">STEP 3 OF 4</span>
+</div>
+<h1 class="font-page-title text-page-title text-primary tracking-tight">Upload {{ P.photos }} photos, pick {{ P.label }} to label</h1>
+</div>
+<!-- Metric Instrument Blocks -->
+<div class="flex items-center gap-space-md">
+<div class="bg-surface-container-low border border-[#DDE2DC] rounded-lg px-space-md py-space-2xs text-left min-w-[140px]">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant block">PHOTOS</span>
+<div class="flex items-baseline gap-space-2xs">
+<span class="font-metric-display text-metric-display text-primary">{{ photos|length }}</span>
+<span class="font-caption text-caption text-on-surface-variant">OF {{ P.photos }}</span>
+</div>
+</div>
+<div class="bg-surface-container-low border border-[#DDE2DC] rounded-lg px-space-md py-space-2xs text-left min-w-[140px]">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant block">SPLIT</span>
+<div class="flex items-baseline gap-space-2xs">
+<span class="font-metric-display text-metric-display text-secondary">{{ P.label }}:{{ P.test }}</span>
+<span class="font-caption text-caption text-on-surface-variant">YOU LABEL / AI TESTED</span>
+</div>
+</div>
+</div>
+</div>
+<div class="pt-space-md flex items-start gap-space-xs">
+<span class="material-symbols-outlined text-secondary mt-0.5">info</span>
+<p class="font-body-default text-body-default text-on-surface-variant max-w-4xl">
+          You will label {{ P.label }} of these photos: the AI guesses every plant and you fix its mistakes. Then the AI labels the other {{ P.test }} on its own and you check how it did.
+        </p>
+</div>
+</section>
+{% if photos|length < P.photos %}
+<section id="uploadform" class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-md mb-space-lg">
+<form method="post" action="/field/{{ field }}/upload" enctype="multipart/form-data" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-space-sm">
+<div class="flex-1">
+<div class="font-body-strong text-body-strong text-primary">Upload field photos ({{ photos|length }}/{{ P.photos }})</div>
+<div class="font-caption text-caption text-on-surface-variant">Overhead shots, daylight, no flash. You can add several at once.</div>
+</div>
+<input type="file" name="photos" accept="image/*" multiple required class="flex-1 min-w-0 font-body-default text-body-default text-on-surface">
+<button class="bg-primary-container text-white rounded-[6px] px-space-lg py-space-xs font-body-strong text-body-default hover:bg-primary transition-colors min-h-[44px]">Upload</button>
+</form>
+{% if error %}<p class="font-body-default text-body-default text-error mt-space-xs">{{ error }}</p>{% endif %}
+</section>
+{% endif %}
+<form method="post" action="/field/{{ field }}/select" id="selectform">
+<!-- 5 PHOTO UPLOAD SLOTS (Balanced Horizontal Row for 1440px) -->
+<section class="mb-space-lg">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">YOUR {{ P.photos }} PHOTOS</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-md">
+{% for p in photos %}
+<!-- SLOT -->
+<article class="bg-surface-container-lowest {% if p.selected %}border-2 border-secondary{% else %}border border-[#DDE2DC] opacity-95{% endif %} rounded-xl overflow-hidden flex flex-col justify-between relative transition-all">
+<div class="p-space-xs pb-0">
+<!-- Quality Chip & Index -->
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-metric-inline text-caption {% if p.selected %}font-semibold text-secondary{% else %}text-on-surface-variant{% endif %}">SLOT {{ '%02d' % loop.index }}</span>
+{% if p.quality == 'OK' %}
+<div class="bg-surface-container-lowest border border-[#DDE2DC] rounded px-space-xs py-[2px] flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-[#2E9E5B]"></span>
+<span class="font-label-instrument text-[11px] text-primary whitespace-nowrap">● OK</span>
+</div>
+{% else %}
+<div class="bg-surface-container-lowest border border-[#DDE2DC] rounded px-space-xs py-[2px] flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-[#E3A21A]"></span>
+<span class="font-label-instrument text-[11px] text-primary whitespace-nowrap">● {{ p.quality }}</span>
+</div>
+{% endif %}
+</div>
+<!-- Optical Frame / Image -->
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-[#DDE2DC] bg-[#18201B]">
+<img class="w-full h-full object-cover" data-alt="{{ p.name }}" src="/p/{{ field }}/{{ p.file }}"/>
+<div class="absolute inset-0 pointer-events-none optical-reticle"></div>
+{% if p.selected %}
+<div class="absolute bottom-1 right-1 bg-primary/80 backdrop-blur-none text-white px-1.5 py-0.5 rounded font-metric-inline text-[10px]">
+                CAL-{{ '%02d' % loop.index }}
+              </div>
+{% else %}
+<div class="absolute bottom-1 right-1 bg-surface-container-highest/90 text-primary px-1.5 py-0.5 rounded font-metric-inline text-[10px]">
+                TEST-{{ '%02d' % loop.index }}
+              </div>
+{% endif %}
+</div>
+</div>
+<!-- Metadata & Radio Status -->
+<div class="p-space-xs pt-space-xs flex-1 flex flex-col justify-between">
+<div class="font-metric-inline text-caption text-on-surface-variant border-b border-[#DDE2DC] pb-space-xs mb-space-xs">
+              {{ p.name }} • {{ p.dims }}{% if p.labeled %} • ✓ labeled{% endif %}
+            </div>
+<!-- Calibration Card Highlight / Selector -->
+<label class="{% if p.selected %}bg-surface-container-low border-secondary{% else %}bg-surface-container-lowest border-[#DDE2DC]{% endif %} border rounded-lg p-space-xs flex items-start gap-space-xs cursor-pointer min-h-[48px]">
+<input name="pick" value="{{ p.name }}" {% if p.selected %}checked=""{% endif %} class="mt-0.5 w-5 h-5 rounded border-[#DDE2DC] text-primary focus:ring-0 focus:ring-offset-0" type="checkbox"/>
+<div class="flex-1">
+<span class="font-body-strong text-caption text-primary block leading-tight">
+{% if p.selected %}[✓] Selected for manual labeling{% else %}Select for manual labeling{% endif %}
+                </span>
+<span class="font-label-instrument text-[11px] text-secondary font-semibold uppercase block mt-0.5">
+{% if p.selected %}(Calibration photo){% else %}(Test photo unless picked){% endif %}
+                </span>
+</div>
+</label>
+<div class="grid grid-cols-2 gap-space-2xs mt-space-xs">
+<button type="button" data-replace="{{ p.name }}" class="border border-[#DDE2DC] rounded-lg min-h-[44px] flex items-center justify-center gap-1 font-label-instrument text-label-instrument text-primary hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">swap_horiz</span>Replace
+</button>
+<button type="button" data-remove="{{ p.name }}"{% if p.labeled %} data-labeled="1"{% endif %} class="border border-[#DDE2DC] rounded-lg min-h-[44px] flex items-center justify-center gap-1 font-label-instrument text-label-instrument text-[#D2452B] hover:bg-[#D2452B]/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete</span>Remove
+</button>
+</div>
+</div>
+</article>
+{% endfor %}
+{% for i in range(photos|length + 1, P.photos + 1) %}
+<article class="bg-surface-container-low border border-dashed border-outline-variant rounded-xl overflow-hidden flex flex-col justify-between relative opacity-70">
+<div class="p-space-xs pb-0">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="font-metric-inline text-caption text-on-surface-variant">SLOT {{ '%02d' % i }}</span>
+</div>
+<div class="relative w-full aspect-[4/3] rounded-lg overflow-hidden border border-dashed border-outline-variant flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-3xl">add_a_photo</span>
+</div>
+</div>
+<div class="p-space-xs pt-space-xs">
+<div class="font-caption text-[12px] text-on-surface-variant text-center">Empty slot — upload above</div>
+</div>
+</article>
+{% endfor %}
+</div>
+</section>
+<!-- SELECTION SUMMARY STRIP & ACTION CONTROLS -->
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-md flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between shadow-none">
+<!-- Status Readout -->
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-lg bg-surface-container-low border border-[#DDE2DC] flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined">checklist</span>
+</div>
+<div>
+<div class="flex items-center gap-space-xs">
+<span class="font-body-strong text-body-strong text-primary"><span id="sel-count">{{ selected|length }}</span> photos picked for you to label</span>
+<span class="text-outline-variant">•</span>
+<span class="font-body-default text-body-default text-on-surface-variant">the other {{ P.test }} test the AI</span>
+</div>
+<span class="font-caption text-caption text-outline block">
+            FIELD: {{ field }} • SELECT EXACTLY {{ P.label }} OF {{ photos|length }}
+          </span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-space-sm">
+<button id="reupload-btn" class="bg-surface-container-lowest text-primary border border-[#DDE2DC] rounded-[6px] px-space-md py-space-xs font-body-strong text-caption hover:bg-surface transition-colors flex items-center gap-space-2xs min-h-[44px]" type="button">
+<span class="material-symbols-outlined">sync</span>
+<span>Re-upload / Replace photos</span>
+</button>
+<button id="proceed-btn" class="bg-primary-container text-white border-0 rounded-[6px] px-space-lg py-space-xs font-body-strong text-body-default hover:bg-primary transition-colors flex items-center gap-space-xs min-h-[44px]" type="submit">
+<span>Proceed to Label Photo 1 of {{ P.label }}</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</section>
+</form>
+<form id="replace-form" method="post" enctype="multipart/form-data" class="hidden">
+<input type="file" name="photo" accept="image/*">
+</form>
+<form id="remove-form" method="post" class="hidden"></form>
+<form id="replace-all-form" method="post" action="/field/{{ field }}/photos/replace_all" enctype="multipart/form-data" class="hidden">
+<input type="file" name="photos" accept="image/*" multiple>
+</form>
+{% if error and photos|length >= P.photos %}<p class="font-body-default text-body-default text-error mt-space-xs">{{ error }}</p>{% endif %}
+</main>
+<script>
+const form = document.getElementById('selectform');
+const boxes = Array.from(form.querySelectorAll('input[name=pick]'));
+const count = document.getElementById('sel-count');
+const go = document.getElementById('proceed-btn');
+const NEED = {{ P.label }};
+function sync() {
+  const n = boxes.filter(b => b.checked).length;
+  count.textContent = n;
+  go.disabled = n !== NEED;
+  go.classList.toggle('opacity-40', n !== NEED);
+  boxes.forEach(b => { b.disabled = !b.checked && n >= NEED; });
+}
+boxes.forEach(b => b.addEventListener('change', sync));
+sync();
+
+const FIELD = '{{ field }}';
+const N_PHOTOS = {{ photos|length }};
+const repForm = document.getElementById('replace-form');
+const repInput = repForm.querySelector('input');
+document.querySelectorAll('[data-replace]').forEach(b => b.addEventListener('click', () => {
+  repForm.action = '/field/' + FIELD + '/photo/' + encodeURIComponent(b.dataset.replace) + '/replace';
+  repInput.value = '';
+  repInput.click();
+}));
+repInput.addEventListener('change', () => { if (repInput.files.length) repForm.submit(); });
+document.querySelectorAll('[data-remove]').forEach(b => b.addEventListener('click', () => {
+  const warn = b.dataset.labeled ? '\nYour labels for this photo will be deleted too.' : '';
+  if (!confirm('Remove ' + b.dataset.remove + '?' + warn)) return;
+  const f = document.getElementById('remove-form');
+  f.action = '/field/' + FIELD + '/photo/' + encodeURIComponent(b.dataset.remove) + '/remove';
+  f.submit();
+}));
+// Fewer than 5: open the add-photos picker. Full: replace the whole set.
+const addForm = document.querySelector('#uploadform form');
+const addInput = addForm && addForm.querySelector('input[type=file]');
+if (addInput) addInput.addEventListener('change', () => { if (addInput.files.length) addForm.submit(); });
+const allForm = document.getElementById('replace-all-form');
+const allInput = allForm.querySelector('input');
+document.getElementById('reupload-btn').addEventListener('click', () => {
+  if (N_PHOTOS < {{ P.photos }} && addInput) { addInput.click(); return; }
+  if (!confirm('Replace all ' + N_PHOTOS + ' photos with new ones?\nTheir labels, fixes and test results will be deleted.')) return;
+  allInput.value = '';
+  allInput.click();
+});
+allInput.addEventListener('change', () => { if (allInput.files.length) allForm.submit(); });
+</script>
+</body></html>

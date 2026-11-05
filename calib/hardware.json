@@ -1,0 +1,85 @@
+{
+ "note": "Every pin and limit of the real robot (BCM GPIO numbers). Explained in calib/HARDWARE.md. Values in 'to_measure' are first guesses: measure them (roadmap step 7) and move their names to 'measured'.",
+ "measured": [],
+ "to_measure": [
+  "motors.min_duty",
+  "motors.duty_per_cm_s",
+  "encoder.slots",
+  "encoder.wheel_mm",
+  "motors.brake_s"
+ ],
+ "motors": {
+  "front": {
+   "forward": 19,
+   "backward": 16,
+   "enable": 6,
+   "reverse": false
+  },
+  "rear": {
+   "forward": 26,
+   "backward": 20,
+   "enable": 13,
+   "reverse": false
+  },
+  "pwm_hz": 100,
+  "brake_s": 0.3,
+  "min_duty": 35,
+  "duty_per_cm_s": 4.0,
+  "kp": 4.0,
+  "ki": 3.0,
+  "ramp_duty_per_s": 120
+ },
+ "encoder": {
+  "pin_a": 5,
+  "pin_b": null,
+  "slots": 20,
+  "wheel_mm": 65,
+  "glitch_us": 100
+ },
+ "arm_servo": {
+  "pin": 21,
+  "pulse_min_us": 500,
+  "pulse_max_us": 2400
+ },
+ "tilt_servo": {
+  "pin": null
+ },
+ "pump_gpio_bcm": 17,
+ "laser_gpio_bcm": null,
+ "buttons": {
+  "green": null,
+  "red_sense": null
+ },
+ "camera": {
+  "source": "phone",
+  "port": 8444,
+  "width": 1296,
+  "height": 972,
+  "rotate_deg": 0,
+  "jpeg_quality": 0.92,
+  "capture_timeout_s": 4,
+  "capture_retries": 3
+ },
+ "limits": {
+  "max_speed_cm_s": 8,
+  "pump_max_ms": 500,
+  "servo_min_deg": 10,
+  "servo_max_deg": 170,
+  "watchdog_s": 2,
+  "stall_s": 3
+ },
+ "recording": {
+  "speed_cm_s": 3,
+  "max_cm": 150,
+  "stall_s": 3,
+  "crop_to_tray": true
+ },
+ "field_run": {
+  "speed_cm_s": 3,
+  "max_cm": 200,
+  "travel_cm": 90,
+  "stall_s": 2,
+  "aim_hold_s": 20,
+  "reaim_min_conf": 0.85
+ }
+}

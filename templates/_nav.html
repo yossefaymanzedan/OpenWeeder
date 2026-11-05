@@ -1,0 +1,93 @@
+{# Shared left navigation. Include right after <body>. Active item comes
+   from the Flask endpoint; field steps appear whenever `field` is set. #}
+{% set ep = request.endpoint or '' %}
+{% set nav_field = field if field is defined and field else None %}
+{% set step_of = {'field_page': 'overview', 'guide': 'guide',
+                  'upload_form': 'upload', 'upload': 'upload',
+                  'job': 'label', 'label': 'label',
+                  'learning': 'learning', 'results': 'results', 'fix': 'results',
+                  'ready': 'ready'} %}
+{% set cur_step = step_of.get(ep) %}
+<style>
+.ow-side{position:fixed;top:0;left:0;bottom:0;width:16rem;z-index:60;display:flex;flex-direction:column;justify-content:space-between;gap:1rem;padding:1rem;overflow-y:auto;background:#fff;border-right:1px solid #DDE2DC;font-family:'IBM Plex Sans',sans-serif;transform:translateX(-100%);transition:transform .2s ease}
+.ow-side.open{transform:none}
+.ow-brand{display:flex;align-items:center;gap:.5rem;padding:0 .25rem .75rem;border-bottom:1px solid #DDE2DC;color:#020603;font-size:18px;font-weight:600;text-decoration:none}
+.ow-brand i{width:12px;height:12px;background:#066c41;border-radius:2px;display:inline-block}
+.ow-sec{margin:1rem .25rem .35rem;font:600 11px/16px 'IBM Plex Sans',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#747874;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ow-link{display:flex;align-items:center;gap:.6rem;min-height:44px;padding:.5rem .75rem;border-left:2px solid transparent;border-radius:0 4px 4px 0;color:#434844;font-size:14px;font-weight:500;text-decoration:none}
+.ow-link:hover{background:#e6f1e7;color:#141e18}
+.ow-link .material-symbols-outlined{font-size:20px}
+.ow-link.on{background:#ecf6ed;border-left-color:#066c41;color:#020603;font-weight:700}
+.ow-link.on .material-symbols-outlined{color:#066c41;font-variation-settings:'FILL' 1}
+.ow-link.off{opacity:.45;pointer-events:none}
+.ow-link small{margin-left:auto;font:500 11px 'JetBrains Mono',monospace;color:#747874}
+.ow-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid #747874;flex:none}
+.ow-dot.done{background:#2E9E5B;border-color:#2E9E5B}
+.ow-dot.next{background:#E3A21A;border-color:#E3A21A}
+.ow-mbar{display:flex;width:100%;align-items:center;gap:.5rem;padding:.25rem .75rem;background:#fff;border-bottom:1px solid #DDE2DC;font-family:'IBM Plex Sans',sans-serif}
+.ow-mbar button{width:44px;height:44px;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.ow-mbar button:active{background:#e6f1e7}
+.ow-mbar b{font-size:16px;color:#020603}
+.ow-mbar span.f{font-size:13px;color:#434844;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ow-scrim{display:none;position:fixed;inset:0;z-index:55;background:#18201b66}
+.ow-scrim.open{display:block}
+@media (min-width:1024px){
+  .ow-side{transform:none}
+  .ow-mbar,.ow-scrim{display:none!important}
+  body{padding-left:16rem}
+  body footer.fixed{left:16rem;width:calc(100% - 16rem)}
+}
+</style>
+<div class="ow-mbar">
+<button type="button" aria-label="Open menu" onclick="owNav(true)"><span class="material-symbols-outlined">menu</span></button>
+<b>OpenWeeder</b>
+{% if nav_field %}<span class="f">/ {{ nav_field }}</span>{% endif %}
+</div>
+<div class="ow-scrim" onclick="owNav(false)"></div>
+<aside class="ow-side" aria-label="Main navigation">
+<div>
+<a class="ow-brand" href="/"><i></i>OpenWeeder</a>
+<nav>
+<div class="ow-sec">Platform</div>
+<a class="ow-link{{ ' on' if ep == 'index' }}" data-nav="home" href="/"><span class="material-symbols-outlined">dashboard</span>Home</a>
+<a class="ow-link{{ ' on' if ep in ('crop', 'crop_add', 'new_crop') or (nav_field and not cur_step) }}" data-nav="crops" href="/#crops"><span class="material-symbols-outlined">psychiatry</span>Crops</a>
+<a class="ow-link{{ ' on' if ep in ('farm_list', 'farm_page') }}" data-nav="fields" href="/fields"><span class="material-symbols-outlined">agriculture</span>Fields</a>
+<a class="ow-link off" href="#" aria-disabled="true"><span class="material-symbols-outlined">precision_manufacturing</span>Robot<small>soon</small></a>
+{% if nav_field %}
+<div class="ow-sec">Field · {{ nav_field }}</div>
+<a class="ow-link{{ ' on' if cur_step == 'overview' }}" href="/field/{{ nav_field }}"><span class="material-symbols-outlined">space_dashboard</span>Overview</a>
+{% for s in nav_steps(nav_field) %}
+<a class="ow-link{{ ' on' if cur_step == s.key }}" href="{{ s.url }}"><span class="ow-dot {{ s.state }}"></span>{{ s.label }}<small>{{ s.note }}</small></a>
+{% endfor %}
+{% endif %}
+</nav>
+</div>
+<div>
+<a class="ow-link{{ ' on' if ep == 'field_new_form' }}" href="/crop/new"><span class="material-symbols-outlined">add</span>New crop</a>
+<a class="ow-link{{ ' on' if ep == 'train_crop' }}" href="/crop/train"><span class="material-symbols-outlined">model_training</span>Train new crop</a>
+<a class="ow-link{{ ' on' if ep in ('train_pick', 'train_page') }}" href="/train"><span class="material-symbols-outlined">neurology</span>Train model</a>
+<a class="ow-link{{ ' on' if ep == 'run_field_page' }}" href="/run-field"><span class="material-symbols-outlined">play_circle</span>Run on the field</a>
+<a class="ow-link{{ ' on' if ep == 'farm_new_form' }}" href="/fields/new"><span class="material-symbols-outlined">add_location_alt</span>New field</a>
+<a class="ow-link off" href="#" aria-disabled="true"><span class="material-symbols-outlined">translate</span>العربية<small>soon</small></a>
+</div>
+</aside>
+<script>
+function owNav(open) {
+  document.querySelector('.ow-side').classList.toggle('open', open);
+  document.querySelector('.ow-scrim').classList.toggle('open', open);
+}
+// /#crops is a section of the home page, not a separate page:
+// the server only sees "/", so the browser picks the active item from the #.
+(function () {
+  if (location.pathname !== '/') return;
+  const sync = () => {
+    const want = {'#crops': 'crops'}[location.hash] || 'home';
+    document.querySelectorAll('.ow-side [data-nav]').forEach(a =>
+      a.classList.toggle('on', a.dataset.nav === want));
+  };
+  window.addEventListener('hashchange', sync);
+  document.querySelectorAll('.ow-side [data-nav]').forEach(a =>
+    a.addEventListener('click', () => owNav(false)));
+  sync();
+})();
+</script>

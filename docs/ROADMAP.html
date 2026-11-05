@@ -1,0 +1,567 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OpenWeeder Robot Roadmap</title>
+<style>
+  :root {
+    --bg: #f6f7f5;
+    --surface: #ffffff;
+    --surface-2: #eef1ec;
+    --text: #1d2420;
+    --muted: #5d6a62;
+    --border: #d7ddd6;
+    --accent: #2e7d32;
+    --accent-soft: #e3f1e4;
+    --warn: #a15c00;
+    --warn-soft: #fbefdc;
+    --danger: #b3261e;
+    --danger-soft: #fbe5e3;
+    --info: #1f5fa8;
+    --info-soft: #e3edf9;
+    --done: #2e7d32;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121614;
+      --surface: #1a201c;
+      --surface-2: #222a25;
+      --text: #e6ebe7;
+      --muted: #9aa69f;
+      --border: #313b35;
+      --accent: #66bb6a;
+      --accent-soft: #1f3322;
+      --warn: #f0a640;
+      --warn-soft: #3a2c16;
+      --danger: #ef7a72;
+      --danger-soft: #3d1d1b;
+      --info: #7fb2ee;
+      --info-soft: #1a2a3d;
+      --done: #66bb6a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121614;
+    --surface: #1a201c;
+    --surface-2: #222a25;
+    --text: #e6ebe7;
+    --muted: #9aa69f;
+    --border: #313b35;
+    --accent: #66bb6a;
+    --accent-soft: #1f3322;
+    --warn: #f0a640;
+    --warn-soft: #3a2c16;
+    --danger: #ef7a72;
+    --danger-soft: #3d1d1b;
+    --info: #7fb2ee;
+    --info-soft: #1a2a3d;
+    --done: #66bb6a;
+  }
+
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  .page { max-width: 920px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 20px; margin: 32px 0 12px; }
+  .sub { color: var(--muted); margin: 0 0 16px; }
+  code { font: 0.9em ui-monospace, "SF Mono", Menlo, Consolas, monospace; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+
+  .topbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: stretch; margin-bottom: 8px; }
+  .stat { flex: 1 1 180px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+  .stat .label { color: var(--muted); font-size: 13px; }
+  .stat .value { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bar { height: 10px; background: var(--surface-2); border-radius: 99px; overflow: hidden; margin-top: 8px; }
+  .bar > div { height: 100%; width: 0; background: var(--accent); transition: width .3s; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 0; }
+  button, select {
+    font: inherit; font-size: 14px; color: var(--text); background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer;
+  }
+  button:hover { border-color: var(--accent); }
+
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { background: var(--surface-2); font-size: 14px; }
+  tr:last-child td { border-bottom: 0; }
+  .table-wrap { overflow-x: auto; }
+
+  .decision { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--warn); border-radius: 10px; padding: 12px 14px; margin-bottom: 10px; }
+  .decision .q { font-weight: 600; }
+  .decision .opts { color: var(--muted); font-size: 14px; margin: 4px 0 8px; }
+  .decision input { width: 100%; font: inherit; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 6px 8px; }
+  .decision.answered { border-left-color: var(--done); }
+
+  .part { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 28px 0 8px; }
+  details.step { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; }
+  details.step > summary { list-style: none; cursor: pointer; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  details.step > summary::-webkit-details-marker { display: none; }
+  .num { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; background: var(--surface-2); color: var(--muted); }
+  .title { flex: 1; min-width: 0; }
+  .title b { display: block; }
+  .title span { color: var(--muted); font-size: 13px; }
+  .count { flex: none; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .pill { flex: none; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+  .s-progress .pill { background: var(--info-soft); color: var(--info); }
+  .s-blocked .pill { background: var(--danger-soft); color: var(--danger); }
+  .s-done .pill { background: var(--accent-soft); color: var(--done); }
+  .s-done .num { background: var(--accent); color: var(--surface); }
+  .s-progress .num { background: var(--info-soft); color: var(--info); }
+  .s-blocked .num { background: var(--danger-soft); color: var(--danger); }
+
+  .body { padding: 0 14px 14px 58px; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; margin-bottom: 10px; }
+  .row label { font-size: 14px; color: var(--muted); }
+  ul.tasks { list-style: none; padding: 0; margin: 0 0 12px; }
+  ul.tasks li { margin: 2px 0; }
+  ul.tasks label { display: flex; gap: 10px; align-items: flex-start; padding: 5px 6px; border-radius: 6px; cursor: pointer; }
+  ul.tasks label:hover { background: var(--surface-2); }
+  ul.tasks input { margin-top: 4px; width: 17px; height: 17px; accent-color: var(--accent); flex: none; }
+  ul.tasks input:checked + span { color: var(--muted); text-decoration: line-through; }
+  .box { border-radius: 8px; padding: 8px 12px; margin: 8px 0; font-size: 14px; }
+  .box.check { background: var(--accent-soft); }
+  .box.need { background: var(--warn-soft); }
+  .box.risk { background: var(--danger-soft); }
+  .box b { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+  textarea { width: 100%; min-height: 64px; font: inherit; font-size: 14px; color: var(--text); background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px; resize: vertical; }
+  .rules li { margin: 4px 0; }
+  .foot { color: var(--muted); font-size: 13px; margin-top: 32px; }
+
+  @media (max-width: 560px) {
+    .body { padding-left: 14px; }
+    .count { display: none; }
+    details.step > summary { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>OpenWeeder robot roadmap</h1>
+  <p class="sub">Connecting the OpenWeeder platform to the real robot on the Raspberry Pi 4. Source: <code>START_HERE.md</code>, <code>docs/ROBOT_BRIEF.md</code>, <code>docs/PRD_ROBOT_INTEGRATION.md</code>. Your ticks and notes are saved in this browser.</p>
+
+  <div class="topbar">
+    <div class="stat">
+      <div class="label">Steps done</div>
+      <div class="value" id="steps-done">0 / 12</div>
+    </div>
+    <div class="stat">
+      <div class="label">Tasks done</div>
+      <div class="value" id="tasks-done">0 / 0</div>
+      <div class="bar"><div id="bar"></div></div>
+    </div>
+    <div class="stat">
+      <div class="label">Deadline: 4 Nov, 9 PM ET</div>
+      <div class="value" id="countdown">-</div>
+    </div>
+  </div>
+  <div class="toolbar">
+    <button id="expand">Expand all</button>
+    <button id="collapse">Collapse all</button>
+    <button id="theme">Theme: auto</button>
+    <button id="reset">Reset progress</button>
+  </div>
+
+  <h2>What the checks found on this Pi</h2>
+  <div class="table-wrap">
+  <table>
+    <tr><th>Finding</th><th>Why it matters</th><th>Status</th></tr>
+    <tr><td>Python 3.9 (Debian 11), not 3.11</td><td>The SAM library (<code>meta-sam-parser</code>) needs Python 3.10 or later; on 3.9 only an empty placeholder installs. Three platform files also use 3.10-only syntax.</td><td><b>Solved:</b> Python 3.11.18 installed with <code>uv</code>; <code>.venv</code> rebuilt on it. Platform files unchanged.</td></tr>
+    <tr><td>No Pi camera detected</td><td><code>PiHardware.capture()</code> needs a camera.</td><td><b>Decided:</b> use the phone camera, as now (step 6).</td></tr>
+    <tr><td>Single-output encoder, 20 slots</td><td>No direction sensing: the tick sign must come from the commanded direction. At 3 cm/s only about 3 ticks per second, so holding 3 cm/s within &plusmn;15% will be hard.</td><td>Open: handled in step 6, measured in step 7.</td></tr>
+    <tr><td><code>.env</code> readable by every user</td><td>It holds the API key. The 300 MB zip also contains the key.</td><td><b>Solved:</b> <code>chmod 600</code>; zip moved to <code>~/openweeder_private/</code> (owner only).</td></tr>
+    <tr><td><code>pigpiod</code> service was network-exposed</td><td>A <code>public.conf</code> override made it accept GPIO commands from the whole network.</td><td><b>Solved:</b> local-only (<code>-l</code>), starts at boot. Original saved at <code>/root/pigpiod-public.conf.bak</code>.</td></tr>
+    <tr><td>Pip packages missing in <code>.venv</code></td><td>The platform could not import.</td><td><b>Solved:</b> all 15 platform modules import.</td></tr>
+  </table>
+  </div>
+
+  <h2>Decisions</h2>
+  <div id="decisions"></div>
+
+  <h2>Steps</h2>
+  <div id="steps"></div>
+
+  <h2>Rules that apply to every step</h2>
+  <ul class="rules">
+    <li>Never print, log or commit <code>.env</code>.</li>
+    <li>Never connect anything to the pump GPIO except a bench LED with a resistor.</li>
+    <li>Do not change <code>tools/planner.py</code> or <code>tools/geometry.py</code> behaviour; all existing tests must keep passing. Do not edit the tests.</li>
+    <li>Everything that touches hardware goes through <code>Hardware</code>. The simulator and the real robot run the same planner.</li>
+    <li>Never spray a crop. Crop hits must be 0; if not, stop and find the cause.</li>
+    <li>Ask before anything that costs API money.</li>
+    <li>Report honestly: misses, crop hits, anything that failed.</li>
+  </ul>
+
+  <p class="foot">Saved in this browser only (on this device). Open the same file on another device and it starts empty.</p>
+</div>
+
+<script>
+const DEADLINE = Date.parse("2026-11-05T02:00:00Z"); // 4 Nov, 9 PM US Eastern (EST)
+const STORE_KEY = "openweeder-roadmap-v1";
+
+const DECISIONS = [
+  { id: "python", q: "Python 3.9 problem", opts: "(a) one-line fix in 3 files, or (b) Python 3.11",
+    answer: "Python 3.11.18 via uv: the SAM library needs 3.10+, so (a) was not enough" },
+  { id: "zip", q: "The bundle zip (contains the API key)", opts: "Delete it, keep it, or move it somewhere private",
+    answer: "Moved to ~/openweeder_private/ (owner only); checksum verified" },
+  { id: "pigpiod", q: "pigpiod at boot, local-only", opts: "Edit the system service, or start it by hand after each boot",
+    answer: "Yes: enabled at boot with -l (local-only)" },
+  { id: "camera", q: "Camera for capture()", opts: "Pi Camera Module 3, or the phone camera",
+    answer: "Phone camera, as now" },
+  { id: "pins", q: "Pin map confirmed", opts: "Current wiring proposed in step 5; add tilt servo, laser and buttons if used",
+    answer: "Current wiring; no tilt servo, laser or buttons" },
+];
+
+const STEPS = [
+  { part: "Part A: install and verify (START_HERE sections 1-4)" },
+  {
+    id: "s1", title: "Secure the bundle", ref: "START_HERE section 1", status: "done",
+    tasks: [
+      { text: "chmod 600 .env", done: true },
+      { text: "Bundle zip moved to ~/openweeder_private/ (owner only), checksum verified", done: true },
+      { text: "Use ~/OpenWeeder as the working directory (paths are relative)", done: true },
+    ],
+    check: ".env shows -rw------- and is still listed in .gitignore.",
+  },
+  {
+    id: "s2", title: "Python environment", ref: "START_HERE section 2", status: "done",
+    tasks: [
+      { text: "Python 3.11.18 installed with uv (the SAM library needs 3.10+)", done: true },
+      { text: ".venv rebuilt on 3.11; the old 3.9 one kept as .venv-py39-backup", done: true },
+      { text: "Installed requirements-pi.txt, requirements-apps.txt (our apps), pytest, opencv-python-headless", done: true },
+      { text: "pigpiod at boot, local-only", done: true },
+      { text: "All 15 platform modules import; 74 platform files identical to the bundle", done: true },
+    ],
+    check: "Every module in tools/ imports without errors.",
+  },
+  {
+    id: "s3", title: "Verify the import", ref: "START_HERE section 3", status: "done",
+    tasks: [
+      { text: "test_planner, test_geometry, test_trainer, test_runner: 64 passed in 6.5 s; no tests edited", done: true },
+      { text: "Info script: images 200, labeled 200, model True", done: true },
+      { text: "setup done True, yolo mAP50 0.4757, advice \"mAP50 0.48 is below 0.70: use SAM + Muse\"", done: true },
+    ],
+    check: "All tests pass and the info values match.",
+  },
+  {
+    id: "s4", title: "Start the web app", ref: "START_HERE section 4", status: "done",
+    tasks: [
+      { text: "python tools/app.py, listening on 0.0.0.0:5000 (log in out/app.log)", done: true },
+      { text: "Crops shows Molokhia", done: true },
+      { text: "Train model -> Molokhia: 200 images, 200 labeled, metrics table, 12/12 test-set examples load", done: true },
+      { text: "Run on the field: Molokhia, \"use SAM + Muse\", measured 20/44 weeds (45.5%), 1 crop hit, 35.4 s per picture; Start says \"No robot is connected yet\"", done: true },
+      { text: "Real browser: no JavaScript errors, all 36 images load, fits a phone screen; 67 internal links crawled, 0 server errors", done: true },
+      { text: "SAM API check (prompt \"plant\"): 7 plants on ref_1.jpg in 17.4 s, $0.0025; key not in any log", done: true },
+    ],
+    check: "All pages load from the phone at http://192.168.1.8:5000.",
+    risk: "START_HERE's sam_probe command is missing --prompt (required); use --prompt plant.",
+  },
+  { part: "Part B: robot integration (PRD order)" },
+  {
+    id: "s5", title: "Configuration and pin map", ref: "PRD R10", status: "progress",
+    tasks: [
+      "Create calib/hardware.json and a documented template",
+      "L298N: ENA GPIO6 (pin 31), IN1 GPIO19 (35), IN2 GPIO16 (36), ENB GPIO13 (33), IN3 GPIO26 (37), IN4 GPIO20 (38); PWM frequency; brake mode",
+      "Encoder: GPIO5 (pin 29), single channel, 20 pulses per revolution, 65 mm wheel (confirm)",
+      "Arm servo SG90: GPIO21 (pin 40), 500-2400 us",
+      "Pump (dummy): BCM 17 (pin 11), nothing wired, LED for bench",
+      "Tilt servo, laser, green/red button sense: TBD or unused",
+      "Limits: max_speed_cm_s 8, pump_max_ms 500, servo safe range [10, 170], watchdog_s 2",
+    ],
+    check: "Every pin and limit is in one file and matches the real wiring. Done: calib/hardware.json + calib/HARDWARE.md. Open: confirm 20 slots and 65 mm wheel; min_duty and duty_per_cm_s are guesses.",
+    need: "You confirm the pin map, encoder slots and wheel diameter.",
+  },
+  {
+    id: "s6", title: "PiHardware", ref: "PRD R1, R2, R6", status: "progress",
+    tasks: [
+      "drive(speed): non-blocking, encoder speed loop, clamp to max, ramp",
+      "stop(): active L298N brake, returns immediately",
+      "ticks(): signed cumulative, thread-safe, readable at 50 Hz or more",
+      "capture(): RGB uint8 1296x972, top = forward, fixed focus and exposure, 0.15 s or less",
+      "servo_set(angle): non-blocking, jitter-free hardware PWM, refuses unsafe angles",
+      "pump(ms): dummy pin HIGH, wait, LOW in try/finally; capped; only when armed",
+      "laser(on): optional GPIO output",
+      "Starts disarmed; explicit arm() / disarm()",
+      "Watchdog 2 s: motors stop, pump pin LOW, arm parks; same on any exception",
+      "Event log {t, type, value, tick, arm} written to out/run_<stamp>_events.json",
+      "dry_run=True: same code path, no motion, simulated ticks",
+      "Park the arm on start and on any stop or fault",
+    ],
+    check: "Bench phase 0 passes (step 7) and dry run works. Done: written; 17 dry-run tests pass; camera = phone (tools/phone_cam.py, port 8444, zoom). Open: never run on the real car yet.",
+    need: "Camera decision.",
+    risk: "Holding 3 cm/s within 15% with 20 slots (about 3 ticks per second) may not be reachable; the result will be reported as measured.",
+  },
+  {
+    id: "s7", title: "Calibration on the real car", ref: "PRD R5, R11; test phases 0 and 2",
+    tasks: [
+      "Bench: ticks direction correct, servo angles within 2 degrees, pump(150) gives 150 +/-10 ms and ends LOW, frame sharp at 25 cm",
+      "Drive exactly 100 cm three times; tools/measure_ticks.py; counts agree within 2%",
+      "Coast distance after stop() at 3 and 5 cm/s; minimum reliable speed; drift over 100 cm",
+      "Servo: center_trim_deg, sign, max_deg, park_deg; arm_length_cm; spray_radius_cm",
+      "Camera: camera_height_cm, ridge_height_cm, camera_to_nozzle_cm (D), camera_side_offset_cm, nozzle_height_cm",
+      "A4 homography for ridge and furrow planes; tools/check_points.py about 1 cm average error",
+      "Timing constants at the top of tools/hardware.py: coast, settle, servo travel, capture",
+      "Every value written to calib/robot.json / calib/servo.json and the measured map",
+    ],
+    check: "measure_ticks repeatable within 2%; A4 check about 1 cm; arm hits a marked point within 1.5 cm.",
+    need: "Your measurements on the car.",
+  },
+  {
+    id: "s8", title: "Tests", ref: "PRD R12",
+    tasks: [
+      "tests/test_pi_hardware.py with dry_run: ticks sign, pump pin ends LOW, caps and refusals, watchdog, event log",
+      "Sim vs dry-run equivalence: same event types and stop ticks within 1 tick",
+      "All existing planner, geometry, trainer and runner tests still pass",
+    ],
+    check: "Whole test suite green.",
+  },
+  {
+    id: "s9", title: "Run on the field", ref: "PRD R9; test phase 1", status: "progress",
+    tasks: [
+      { text: "Tray finder tools/tray.py: finds the tray walls, crops it straight and centred, 17 ms per frame; live view on Run on the field; 7 tests", done: true },
+      { text: "Detectors (SAM + Muse, YOLO) see only the tray crop; detections outside the tray are dropped; spray points mapped back to frame pixels for geometry.py", done: true },
+      "Check the tray finder on real frames from the phone mounted on the robot",
+      { text: "Planner detect runs in a worker pool (vision_workers 3); the loop keeps reading ticks", done: true },
+      { text: "Test with a backend whose detect really sleeps: no overshoot of the stop tick", done: true },
+      { text: "runner.run_on_field() in sam_muse mode, two-pass flow (camera D = 12 cm)", done: true },
+      { text: "mp4 with detections drawn (crop green, weed red, unsure grey)", done: true },
+      { text: "Events log and summary JSON {frames, sprays, skipped, seconds, usd}", done: true },
+      { text: "App runs it in a background thread with status and a working Stop", done: true },
+      "Phase 1 dry run: stub vision with canned weeds; stops within +/-1 cm; kill test for the watchdog",
+      "Write the chosen D into calib/robot.json",
+      "Optional: yolo mode, with seconds per frame measured honestly",
+    ],
+    check: "Dry run on the rails stops at every planned tick within 1 cm; Stop leaves the hardware safe.",
+  },
+  {
+    id: "s10", title: "Field demo", ref: "PRD test phase 4",
+    tasks: [
+      "1 m of real molokhia, SAM + Muse, two-pass, dummy pump",
+      "Run completes; video and event log written",
+      "Report: weeds visible, weeds sprayed, crop hits (from the video), time, API cost",
+      "If crop hits > 0: stop and find the cause",
+    ],
+    check: "No spray event lands on a crop; roughly half the visible weeds get a spray event.",
+    need: "OK for API cost (about 2 cents per picture).",
+  },
+  {
+    id: "s11", title: "Data recording", ref: "PRD R8; test phase 3", status: "progress",
+    tasks: [
+      "trainer.record_images(): 2 frames per second, JPEG quality about 92, numbering continues",
+      "ticks.json next to the frames",
+      { text: "Each saved photo is the tray crop (tools/tray.py); full frames in train/raw, walls in train/trays.json; QR code of the phone link on the Train model and Run on the field pages", done: true },
+      "App collect route runs in a background thread with status; Stop sets the event",
+    ],
+    check: "About 2 images per second saved, numbered, not blurred; Stop works. Done in dry run: Start robot on the Train model page, 1.9 photos/s, 1296x972, ticks.json, stops at 150 cm / Stop / stall; refuses without the phone. Open: first run on the real car.",
+  },
+  {
+    id: "s12", title: "Answers document", ref: "PRD section 9",
+    tasks: [
+      "docs/ROBOT_ANSWERS.md: hardware, camera position, arm length, coast and drift",
+      "GPIO library choice, network on the field, arm/disarm method, YOLO seconds per frame",
+    ],
+    check: "Every question in PRD section 9 answered with measured values.",
+  },
+  {
+    id: "s13", title: "Optional extras", ref: "PRD R7, 5.9",
+    tasks: [
+      "Laser output and tilt servo (dummy pin unless a MOSFET driver exists)",
+      "YOLO on the Pi: install ultralytics, measure seconds per frame at 960 px, consider ONNX/NCNN",
+    ],
+    check: "Measured, not assumed.",
+    optional: true,
+  },
+];
+
+const STATUSES = [
+  ["todo", "Not started"],
+  ["progress", "In progress"],
+  ["blocked", "Blocked"],
+  ["done", "Done"],
+];
+
+let state = { tasks: {}, status: {}, notes: {}, decisions: {}, open: {}, theme: "auto" };
+
+function load() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+    if (saved) state = Object.assign(state, saved);
+  } catch (error) {
+    // Storage unavailable: progress lasts until the page closes.
+  }
+}
+
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  } catch (error) {
+    // Storage unavailable.
+  }
+}
+
+function el(tag, attrs, children) {
+  const node = document.createElement(tag);
+  for (const [key, value] of Object.entries(attrs || {})) {
+    if (key === "class") node.className = value;
+    else if (key === "text") node.textContent = value;
+    else node.setAttribute(key, value);
+  }
+  for (const child of children || []) node.append(child);
+  return node;
+}
+
+function renderDecisions() {
+  const wrap = document.getElementById("decisions");
+  for (const d of DECISIONS) {
+    const input = el("input", { type: "text", placeholder: "Your answer" });
+    input.value = d.id in state.decisions ? state.decisions[d.id] : (d.answer || "");
+    const card = el("div", { class: "decision" }, [
+      el("div", { class: "q", text: d.q }),
+      el("div", { class: "opts", text: d.opts }),
+      input,
+    ]);
+    const mark = () => card.classList.toggle("answered", input.value.trim() !== "");
+    input.addEventListener("input", () => { state.decisions[d.id] = input.value; mark(); save(); });
+    mark();
+    wrap.append(card);
+  }
+}
+
+function renderSteps() {
+  const wrap = document.getElementById("steps");
+  let number = 0;
+  for (const step of STEPS) {
+    if (step.part) {
+      wrap.append(el("div", { class: "part", text: step.part }));
+      continue;
+    }
+    number += step.optional ? 0 : 1;
+    const label = step.optional ? "+" : String(number);
+
+    const pill = el("span", { class: "pill" });
+    const count = el("span", { class: "count" });
+    const summary = el("summary", {}, [
+      el("span", { class: "num", text: label }),
+      el("span", { class: "title" }, [el("b", { text: step.title }), el("span", { text: step.ref })]),
+      count,
+      pill,
+    ]);
+
+    const select = el("select", { "aria-label": "Status" });
+    for (const [value, text] of STATUSES) select.append(el("option", { value, text }));
+    select.value = state.status[step.id] || step.status || "todo";
+
+    const list = el("ul", { class: "tasks" });
+    const boxes = [];
+    step.tasks.forEach((task, i) => {
+      const text = typeof task === "string" ? task : task.text;
+      const key = `${step.id}-${i}`;
+      const box = el("input", { type: "checkbox" });
+      box.checked = key in state.tasks ? Boolean(state.tasks[key]) : Boolean(task.done);
+      box.dataset.key = key;
+      boxes.push(box);
+      list.append(el("li", {}, [el("label", {}, [box, el("span", { text })])]));
+    });
+
+    const notes = el("textarea", { placeholder: "Notes, measured values, results..." });
+    notes.value = state.notes[step.id] || "";
+
+    const body = el("div", { class: "body" }, [
+      el("div", { class: "row" }, [el("label", { text: "Status" }), select]),
+      list,
+      el("div", { class: "box check" }, [el("b", { text: "Done when" }), document.createTextNode(step.check)]),
+    ]);
+    if (step.need) body.append(el("div", { class: "box need" }, [el("b", { text: "Needs from you" }), document.createTextNode(step.need)]));
+    if (step.risk) body.append(el("div", { class: "box risk" }, [el("b", { text: "Risk" }), document.createTextNode(step.risk)]));
+    body.append(notes);
+
+    const details = el("details", { class: "step" }, [summary, body]);
+    details.dataset.optional = step.optional ? "1" : "";
+    details.open = Boolean(state.open[step.id]);
+
+    const refresh = () => {
+      const done = boxes.filter((b) => b.checked).length;
+      count.textContent = `${done}/${boxes.length}`;
+      const status = select.value;
+      details.className = `step s-${status}`;
+      pill.textContent = STATUSES.find(([value]) => value === status)[1];
+      details.dataset.status = status;
+      updateTotals();
+    };
+
+    boxes.forEach((box) => box.addEventListener("change", () => {
+      state.tasks[box.dataset.key] = box.checked;
+      const done = boxes.filter((b) => b.checked).length;
+      if (done === boxes.length && select.value !== "done") select.value = "done";
+      else if (done > 0 && select.value === "todo") select.value = "progress";
+      else if (done < boxes.length && select.value === "done") select.value = "progress";
+      state.status[step.id] = select.value;
+      save();
+      refresh();
+    }));
+    select.addEventListener("change", () => { state.status[step.id] = select.value; save(); refresh(); });
+    notes.addEventListener("input", () => { state.notes[step.id] = notes.value; save(); });
+    details.addEventListener("toggle", () => { state.open[step.id] = details.open; save(); });
+
+    wrap.append(details);
+    refresh();
+  }
+}
+
+function updateTotals() {
+  const boxes = [...document.querySelectorAll("ul.tasks input")];
+  const done = boxes.filter((b) => b.checked).length;
+  document.getElementById("tasks-done").textContent = `${done} / ${boxes.length}`;
+  document.getElementById("bar").style.width = boxes.length ? `${(100 * done) / boxes.length}%` : "0";
+  const steps = [...document.querySelectorAll("details.step")].filter((d) => !d.dataset.optional);
+  const stepsDone = steps.filter((d) => d.dataset.status === "done").length;
+  document.getElementById("steps-done").textContent = `${stepsDone} / ${steps.length}`;
+}
+
+function tick() {
+  const left = DEADLINE - Date.now();
+  const out = document.getElementById("countdown");
+  if (left <= 0) {
+    out.textContent = "Passed";
+    return;
+  }
+  const hours = Math.floor(left / 3.6e6);
+  const minutes = Math.floor((left % 3.6e6) / 6e4);
+  out.textContent = `${hours} h ${String(minutes).padStart(2, "0")} min left`;
+}
+
+function applyTheme() {
+  const root = document.documentElement;
+  if (state.theme === "auto") root.removeAttribute("data-theme");
+  else root.setAttribute("data-theme", state.theme);
+  document.getElementById("theme").textContent = `Theme: ${state.theme}`;
+}
+
+document.getElementById("expand").onclick = () => document.querySelectorAll("details.step").forEach((d) => { d.open = true; });
+document.getElementById("collapse").onclick = () => document.querySelectorAll("details.step").forEach((d) => { d.open = false; });
+document.getElementById("theme").onclick = () => {
+  state.theme = { auto: "light", light: "dark", dark: "auto" }[state.theme] || "auto";
+  applyTheme();
+  save();
+};
+document.getElementById("reset").onclick = () => {
+  if (!confirm("Clear all ticks, statuses, notes and answers?")) return;
+  try { localStorage.removeItem(STORE_KEY); } catch (error) { /* ignore */ }
+  location.reload();
+};
+
+load();
+applyTheme();
+renderDecisions();
+renderSteps();
+tick();
+setInterval(tick, 30000);
+</script>
+</body>
+</html>

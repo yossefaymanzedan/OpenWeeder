@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder - Field Photo Labeler</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#020603",
+            "surface-bright": "#f2fcf3",
+            "primary-fixed": "#dce5dc",
+            "primary-container": "#18201b",
+            "inverse-surface": "#29332d",
+            "surface-container-low": "#ecf6ed",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#dbe5dc",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#279856",
+            "on-secondary-fixed": "#002110",
+            "tertiary-fixed": "#8df9ac",
+            "tertiary-container": "#00240e",
+            "on-primary-fixed": "#151d18",
+            "secondary-container": "#9bf2bb",
+            "on-secondary-fixed-variant": "#00522f",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed-variant": "#404943",
+            "secondary-fixed": "#9ef5be",
+            "tertiary": "#000602",
+            "on-surface": "#141e18",
+            "on-secondary": "#ffffff",
+            "background": "#f2fcf3",
+            "surface": "#f2fcf3",
+            "surface-tint": "#58605a",
+            "outline-variant": "#c4c8c2",
+            "outline": "#747874",
+            "primary-fixed-dim": "#c0c9c1",
+            "on-tertiary-fixed-variant": "#005229",
+            "surface-variant": "#dbe5dc",
+            "on-background": "#141e18",
+            "secondary": "#066c41",
+            "surface-container": "#e6f1e7",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#71dc92",
+            "inverse-primary": "#c0c9c1",
+            "on-tertiary-fixed": "#00210d",
+            "secondary-fixed-dim": "#82d8a3",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e0ebe2",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#e9f3ea",
+            "surface-dim": "#d2ddd4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#107145",
+            "on-surface-variant": "#434844"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "1.25rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.5rem",
+            "space-2xs": "0.25rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "section-title": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "body-strong": ["IBM Plex Sans"],
+            "metric-display-mobile": ["JetBrains Mono"],
+            "page-title": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "section-title": ["18px", {"lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600"}],
+            "label-instrument": ["12px", {"lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600"}],
+            "metric-display": ["32px", {"lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600"}],
+            "caption": ["13px", {"lineHeight": "18px", "fontWeight": "400"}],
+            "metric-inline": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+            "body-default": ["15px", {"lineHeight": "22px", "fontWeight": "400"}],
+            "body-strong": ["15px", {"lineHeight": "22px", "fontWeight": "600"}],
+            "metric-display-mobile": ["26px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "page-title": ["28px", {"lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+            "page-title-mobile": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    /* Touch Target & Field Usability constraints */
+    .touch-target {
+      min-height: 48px;
+      min-width: 48px;
+    }
+    #viewport:fullscreen, #d-canvas:fullscreen {
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #viewport:fullscreen #vp-fit, #d-canvas:fullscreen #d-fit {
+      width: auto;
+      max-width: 100vw;
+    }
+    #viewport:fullscreen img.vp-img, #d-canvas:fullscreen img.vp-img {
+      max-height: 100vh;
+      width: auto;
+      max-width: 100vw;
+      height: auto;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#F5F6F3] text-on-surface antialiased flex flex-wrap justify-center selection:bg-secondary selection:text-on-secondary">
+{% include '_nav.html' %}
+<div id="m-ui" class="lg:hidden">
+<!-- Mobile Device Simulation Frame (390px Max Outer Width) -->
+<div class="w-full max-w-[390px] min-h-screen bg-surface-container-lowest flex flex-col relative border-x border-[#DDE2DC] pb-[60px]">
+<!-- Top Navigation Header -->
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-space-sm py-space-xs sticky top-0 z-40 flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<a aria-label="Back" href="/field/{{ field }}" class="w-10 h-10 flex items-center justify-center rounded text-on-surface active:bg-surface-container transition-colors">
+<span class="material-symbols-outlined text-[22px]">arrow_back</span>
+</a>
+<div>
+<div class="flex items-center gap-1.5">
+<span class="font-section-title text-section-title font-bold text-primary tracking-tight">OpenWeeder</span>
+<span class="bg-[#F0F3EF] border border-[#DDE2DC] px-1.5 py-0.5 rounded text-[10px] font-metric-inline font-semibold text-on-surface-variant">Photo {{ pos }}/{{ total }}</span>
+</div>
+<p class="font-caption text-[11px] text-on-surface-variant leading-none">{{ field }} / {{ name }}</p>
+</div>
+</div>
+<div class="flex items-center gap-space-2xs">
+<!-- Language Switcher -->
+
+</div>
+</header>
+{% if crop %}
+<div class="mx-3 mt-2 px-2 py-1.5 bg-[#E3A21A]/15 border border-[#E3A21A] rounded font-label-instrument text-[11px] text-primary">Training <b>{{ crop }}</b>: every plant left as crop becomes a reference.</div>
+{% endif %}
+<!-- Inspection Photo Viewport & Interactive Plant Canvas -->
+<div id="viewport" class="relative w-full bg-surface-dim overflow-hidden select-none border-b border-[#DDE2DC]">
+<button onclick="fsToggle('viewport')" title="Fullscreen" class="absolute top-2 right-2 z-30 w-10 h-10 flex items-center justify-center rounded bg-primary/70 text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+</button>
+<div id="vp-fit" class="relative w-full">
+<!-- Background Agronomic Field Optical Sensor Feed -->
+<img class="vp-img w-full h-auto block brightness-[0.98] contrast-[1.05]" data-alt="{{ name }}" src="/img/{{ key }}"/>
+
+{% for o in objects %}
+<div class="plant-box absolute cursor-pointer" data-view="m" data-id="{{ o.id }}" style="top: {{ o.top }}%; left: {{ o.left }}%; width: {{ o.w }}%; height: {{ o.h }}%; min-width: 44px; min-height: 44px;" onclick="tapPlant({{ o.id }})">
+<div class="box-tag absolute -top-5 left-0 px-1 py-0.2 font-metric-inline text-[10px] font-semibold tracking-wider whitespace-nowrap"></div>
+</div>
+{% endfor %}
+</div>
+<!-- Floating Quick Instruction Pill -->
+<div class="absolute bottom-2 inset-x-2 flex justify-center pointer-events-none">
+<div class="bg-primary/95 text-white border border-[#DDE2DC] px-2.5 py-1 rounded text-center shadow-none flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-tertiary-fixed">touch_app</span>
+<span class="font-body-default text-[11px] font-medium tracking-tight">Tap plant to cycle: Crop → Weed → Skip</span>
+</div>
+</div>
+</div>
+<!-- Telemetry & Inspection Bottom Card (Docked Instrument Panel) -->
+<main class="flex-1 flex flex-col justify-between bg-surface-container-lowest p-space-sm">
+<!-- Metrics Overview Row (IBM Plex Mono) -->
+<section class="border border-[#DDE2DC] bg-[#F5F6F3] p-space-xs rounded mb-space-xs">
+<div class="flex items-center justify-between text-on-surface">
+<div class="flex items-center gap-3">
+<!-- Crop Metric -->
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#2E9E5B] shrink-0"></span>
+<span id="m-crop" class="font-metric-inline text-metric-inline font-semibold text-primary">{{ counts.crop }}</span>
+<span class="font-caption text-[11px] text-on-surface-variant">Crop</span>
+</div>
+<!-- Weed Metric -->
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#D2452B] shrink-0"></span>
+<span id="m-weed" class="font-metric-inline text-metric-inline font-semibold text-primary">{{ counts.weed }}</span>
+<span class="font-caption text-[11px] text-on-surface-variant">Weed</span>
+</div>
+<!-- Unsure Metric -->
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-[#E3A21A] shrink-0"></span>
+<span id="m-unsure" class="font-metric-inline text-metric-inline font-semibold text-primary">{{ counts.unsure }}</span>
+<span class="font-caption text-[11px] text-on-surface-variant">Unsure</span>
+</div>
+</div>
+<!-- Edit Counter -->
+<div class="border-l border-[#DDE2DC] pl-2 text-right">
+<span id="m-changed" class="font-metric-inline text-[11px] font-medium text-secondary">0 edited</span>
+</div>
+</div>
+</section>
+<!-- Selected Plant Inspector Card -->
+<section class="border border-[#DDE2DC] bg-surface-container-lowest p-space-xs rounded mb-space-sm">
+<div class="flex items-center justify-between mb-1.5 pb-1 border-b border-[#DDE2DC]">
+<div class="flex items-center gap-1.5">
+<span class="font-label-instrument text-label-instrument text-on-surface-variant">SELECTED TARGET</span>
+<span id="insp-id" class="px-1 py-0.2 bg-surface-container border border-[#DDE2DC] text-[10px] font-metric-inline font-medium text-primary">ID: #{{ first.id }}</span>
+</div>
+<span id="insp-xy" class="font-metric-inline text-[11px] text-on-surface-variant font-medium">X: {{ first.cx }} | Y: {{ first.cy }}</span>
+</div>
+<div class="flex items-baseline justify-between">
+<div>
+<h3 id="insp-title" class="font-section-title text-[16px] leading-tight font-bold text-primary">Plant #{{ first.id }}: {{ first.pre }}</h3>
+<p id="insp-sub" class="font-caption text-[12px] text-on-surface-variant">Spark: {{ first.reason }}</p>
+</div>
+<div class="text-right">
+<span id="insp-conf" class="font-metric-inline text-[13px] font-semibold text-[#D2452B]">{{ first.conf }} conf</span>
+</div>
+</div>
+</section>
+<!-- Large Touch-Friendly Classification Buttons (Min 48px Height for Field Use) -->
+<section class="grid grid-cols-3 gap-space-xs mb-space-sm">
+<!-- Button: Crop -->
+<button id="btn-crop" onclick="assign('crop')" class="touch-target h-12 flex flex-col items-center justify-center border rounded transition-colors" type="button">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#2E9E5B]"></span>
+<span class="font-body-strong text-body-strong font-semibold">Crop</span>
+</div>
+<span id="sub-crop" class="font-metric-inline text-[9px] mt-0.5">KEY: [1]</span>
+</button>
+<!-- Button: Weed -->
+<button id="btn-weed" onclick="assign('weed')" class="touch-target h-12 flex flex-col items-center justify-center border rounded transition-colors" type="button">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-[#D2452B]"></span>
+<span class="font-body-strong text-body-strong font-bold">Weed</span>
+</div>
+<span id="sub-weed" class="font-metric-inline text-[9px] mt-0.5">KEY: [2]</span>
+</button>
+<!-- Button: Skip -->
+<button id="btn-skip" onclick="assign('skip')" class="touch-target h-12 flex flex-col items-center justify-center border rounded transition-colors" type="button">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-outline">fast_forward</span>
+<span class="font-body-strong text-body-strong font-semibold">Skip</span>
+</div>
+<span id="sub-skip" class="font-metric-inline text-[9px] mt-0.5">NO ACTION</span>
+</button>
+</section>
+<!-- Primary Action: Save & Next Photo -->
+<section class="w-full">
+<button id="save-btn" onclick="saveLabels(this)" class="w-full touch-target h-12 bg-primary text-white rounded font-body-strong text-body-strong font-semibold flex items-center justify-center gap-2 active:bg-inverse-surface border border-primary transition-colors" type="button">
+<span id="save-label">Save &amp; {{ next_label }}</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</section>
+</main>
+</div>
+</div>
+<div id="d-ui" class="hidden lg:block w-full">
+<!-- TOP NAVIGATION BAR (Exact execution of Shared Components JSON TopNavBar + Context breadcrumb) -->
+<header class="bg-surface-container-lowest text-primary flex justify-between items-center w-full px-gutter-desktop py-space-sm border-b border-outline-variant z-50 shrink-0">
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<span class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</span>
+</div>
+<!-- Precision Breadcrumb & Mission Step -->
+<div class="h-4 w-px bg-outline-variant"></div>
+<div class="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span class="text-outline">/</span>
+<a href="/field/{{ field }}" class="hover:text-primary">{{ field }}</a>
+<span class="text-outline">/</span>
+<span class="text-primary font-body-strong font-medium">Labeling (Photo {{ pos }} of {{ total }})</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2 py-0.5 border border-outline-variant rounded bg-surface-container-lowest text-label-instrument font-label-instrument text-on-surface-variant">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+<span>STEP 3 OF 4</span>
+</div>
+</div>
+<!-- Right utility controls & Profile Actions -->
+<div class="flex items-center gap-space-md">
+<!-- Language Switcher -->
+
+
+<!-- JSON actions -->
+<div class="flex items-center gap-space-2xs text-on-surface-variant">
+
+
+
+</div>
+<div class="h-4 w-px bg-outline-variant"></div>
+
+</div>
+</header>
+<!-- WORKSPACE WRAPPER (SideNav + Center Stage + Right Inspector) -->
+<div class="flex flex-1 relative overflow-hidden">
+<!-- LEFT SIDEBAR (SideNavBar Component Implementation) -->
+<!-- Matches Shared Components: docked full-height, 4 tabs (Home, Fields, Crops, Robot), Fields is ACTIVE -->
+<!-- CENTER STAGE: PHOTO ANNOTATION WORKSPACE -->
+<main class="flex-1 flex flex-col bg-background relative overflow-hidden">
+<!-- Top Annotation Toolbar -->
+<div class="bg-surface-container-lowest border-b border-outline-variant px-space-md py-space-2xs flex items-center justify-between z-20 shrink-0">
+<!-- Canvas Transformation and History Tools -->
+<div class="flex items-center gap-1">
+<button id="tb-zoomin" type="button" class="p-1.5 border border-outline-variant rounded hover:bg-surface-container text-primary" title="Zoom In">
+<span class="material-symbols-outlined">zoom_in</span>
+</button>
+<button id="tb-zoomout" type="button" class="p-1.5 border border-outline-variant rounded hover:bg-surface-container text-primary" title="Zoom Out">
+<span class="material-symbols-outlined">zoom_out</span>
+</button>
+<button id="tb-pan" type="button" class="p-1.5 border border-outline-variant rounded hover:bg-surface-container text-primary" title="Pan Workspace (drag the photo)" aria-pressed="false">
+<span class="material-symbols-outlined">pan_tool</span>
+</button>
+<span id="tb-zoom" class="font-metric-inline text-label-instrument text-on-surface-variant w-12 text-center">100%</span>
+<div class="h-5 w-px bg-outline-variant mx-1"></div>
+<button id="tb-undo" type="button" class="p-1.5 border border-outline-variant rounded hover:bg-surface-container text-primary disabled:opacity-40" title="Undo (Ctrl+Z)" disabled>
+<span class="material-symbols-outlined">undo</span>
+</button>
+<button id="tb-redo" type="button" class="p-1.5 border border-outline-variant rounded hover:bg-surface-container text-primary disabled:opacity-40" title="Redo (Ctrl+Y)" disabled>
+<span class="material-symbols-outlined">redo</span>
+</button>
+</div>
+<!-- Keyboard Shortcut Hint / Interaction Advice -->
+<div class="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant">
+<span class="material-symbols-outlined text-outline" style="font-size: 16px;">touch_app</span>
+<span>Click plant box to cycle: <strong class="text-primary font-medium">Crop</strong> → <strong class="text-error font-medium">Weed</strong> → <strong class="text-outline font-medium">Skip</strong></span>
+</div>
+<!-- Frame Coordinates and Sensor Readout -->
+<div class="text-metric-inline font-metric-inline text-label-instrument text-on-surface-variant flex items-center gap-3">
+<span>FRAME: {{ name }}</span>
+<span>RES: {{ dims }}</span>
+<span class="inline-block w-2 h-2 rounded-full bg-secondary"></span>
+</div>
+</div>
+<!-- Interactive Overhead Field Viewport Canvas -->
+{% if crop %}
+<div class="mx-4 mt-2 px-2 py-1.5 bg-[#E3A21A]/15 border border-[#E3A21A] rounded font-label-instrument text-[11px] text-primary">Training <b>{{ crop }}</b>: every plant left as crop becomes a reference.</div>
+{% endif %}
+<div class="flex-1 relative bg-[#e3e7e0] overflow-hidden flex items-center justify-center p-4">
+<!-- Overhead Photo Container with bounding overlays -->
+<div id="d-canvas" class="relative w-full max-w-[960px] bg-[#d9ded7] border border-outline-variant rounded overflow-hidden select-none">
+<button onclick="fsToggle('d-canvas')" title="Fullscreen" class="absolute top-2 right-2 z-30 w-10 h-10 flex items-center justify-center rounded bg-primary/70 text-white hover:bg-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">fullscreen</span>
+</button>
+<div id="d-fit" class="relative w-full">
+<!-- Real Overhead Agriculture Inspection Image -->
+<img class="vp-img w-full h-auto block pointer-events-none" data-alt="{{ name }}" src="/img/{{ key }}"/>
+<!-- Svg HUD Grid & Calibration Overlay -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none opacity-20" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="80" id="field-grid" patternunits="userSpaceOnUse" width="80">
+<path d="M 80 0 L 0 0 0 80" fill="none" stroke="#18201B" stroke-width="0.5"></path>
+</pattern>
+</defs>
+<rect fill="url(#field-grid)" height="100%" width="100%"></rect>
+</svg>
+{% for o in objects %}
+<div class="plant-box absolute cursor-pointer group" data-view="d" data-id="{{ o.id }}" style="top: {{ o.top }}%; left: {{ o.left }}%; width: {{ o.w }}%; height: {{ o.h }}%;" onclick="tapPlant({{ o.id }})">
+<div class="box-tag absolute -top-6 left-0 font-metric-inline text-label-instrument px-1.5 py-0.5 rounded-sm whitespace-nowrap"></div>
+<div class="box-handles hidden">
+<div class="box-handle absolute -top-1 -left-1 w-2.5 h-2.5 bg-white border"></div>
+<div class="box-handle absolute -top-1 -right-1 w-2.5 h-2.5 bg-white border"></div>
+<div class="box-handle absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-white border"></div>
+<div class="box-handle absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-white border"></div>
+</div>
+</div>
+{% endfor %}<!-- Field Bed Water Silt / Furrow Axis Annotation -->
+</div>
+</div>
+</div>
+</main>
+<!-- RIGHT INSPECTOR PANEL: METRICS & SELECTED BOTANICAL CUES -->
+<aside class="w-80 bg-surface-container-lowest border-l border-outline-variant flex flex-col justify-between shrink-0 overflow-y-auto">
+<div class="p-space-md space-y-space-md">
+<!-- Plant Counts Metrics Strip -->
+<div class="border border-outline-variant rounded p-space-sm bg-surface-container-lowest space-y-space-xs">
+<div class="flex items-center justify-between">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">FRAME AUDIT STATUS</span>
+<span id="d-m-changed" class="text-label-instrument font-label-instrument px-1.5 py-0.5 bg-secondary/10 text-secondary border border-secondary/20 rounded">
+              0 CHANGED
+            </span>
+</div>
+<div class="grid grid-cols-3 gap-2 pt-1">
+<!-- Crop Count -->
+<div class="border border-outline-variant rounded p-2 bg-surface-container-low text-center">
+<div class="flex items-center justify-center gap-1 mb-0.5">
+<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">CROP</span>
+</div>
+<div id="d-m-crop" class="text-metric-display font-metric-display text-primary text-xl">{{ counts.crop }}</div>
+</div>
+<!-- Weed Count -->
+<div class="border border-outline-variant rounded p-2 bg-surface-container-low text-center">
+<div class="flex items-center justify-center gap-1 mb-0.5">
+<span class="w-2 h-2 rounded-full bg-[#D2452B]"></span>
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">WEED</span>
+</div>
+<div id="d-m-weed" class="text-metric-display font-metric-display text-primary text-xl">{{ counts.weed }}</div>
+</div>
+<!-- Unsure Count -->
+<div class="border border-outline-variant rounded p-2 bg-surface-container-low text-center">
+<div class="flex items-center justify-center gap-1 mb-0.5">
+<span class="w-2 h-2 rounded-full bg-[#E3A21A]"></span>
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">UNSURE</span>
+</div>
+<div id="d-m-unsure" class="text-metric-display font-metric-display text-primary text-xl">{{ counts.unsure }}</div>
+</div>
+</div>
+<div class="text-caption font-caption text-on-surface-variant flex items-center gap-1.5 pt-1">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">verified</span>
+<span id="d-updated">You updated 0 tags from AI baseline</span>
+</div>
+</div>
+<!-- Selected Plant Inspector Card -->
+<div class="border border-outline-variant rounded p-space-sm bg-surface-container-lowest space-y-space-sm">
+<div class="flex items-center justify-between border-b border-outline-variant pb-space-xs">
+<div class="flex items-center gap-1.5">
+<span id="d-dot" class="w-2.5 h-2.5 rounded-full bg-[#747874]"></span>
+<span id="d-title" class="font-section-title text-body-strong text-primary">Tag #{{ first.id }} {{ first.pre }}</span>
+</div>
+</div>
+<!-- Zoomed Thumbnail of selected weed -->
+<div class="relative w-full h-32 border border-outline-variant rounded overflow-hidden bg-[#e0e5de]">
+<img id="d-thumb" class="w-full h-full object-cover" data-alt="close-up" src="/closeup/{{ key }}/{{ first.id }}"/>
+</div>
+<!-- AI Prediction with Confidence Meter -->
+<div class="space-y-1">
+<div class="flex justify-between items-baseline">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">AI CLASSIFICATION</span>
+<span id="d-ai" class="font-metric-inline text-body-strong">{{ first.pre }} {{ first.conf }}</span>
+</div>
+<!-- Meter Bar -->
+<div class="w-full h-2 bg-surface-container-high rounded-full overflow-hidden">
+<div id="d-meter" class="h-full" style="width: 0%;"></div>
+</div>
+<div class="text-label-instrument font-label-instrument text-on-surface-variant flex justify-between">
+<span id="d-latin">Spark: {{ first.pre }}</span>
+<span id="d-conflevel">—</span>
+</div>
+</div>
+<!-- Botanical Cue Accordion / Readout -->
+<div class="p-space-xs bg-surface-container-low border border-outline-variant rounded space-y-1">
+<div class="text-label-instrument font-label-instrument text-primary flex items-center gap-1">
+<span class="material-symbols-outlined text-secondary" style="font-size: 16px;">psychiatry</span>
+<span>BOTANICAL VALIDATION CUES</span>
+</div>
+<p id="d-cues" class="text-caption font-caption text-on-surface">
+              "{{ first.reason }}"
+            </p>
+</div>
+<!-- Radio/Cycle Class Selection Actions -->
+<div class="space-y-1.5 pt-1">
+<div class="text-label-instrument font-label-instrument text-on-surface-variant">ASSIGN TAXONOMY</div>
+<div class="grid grid-cols-3 gap-1.5">
+<!-- Crop Button -->
+<button id="d-btn-crop" onclick="assign('crop')" class="py-2 px-1 border border-outline-variant rounded text-center hover:bg-surface-container transition-colors text-label-instrument font-label-instrument text-on-surface flex flex-col items-center gap-1 min-h-[48px]">
+<span class="w-2.5 h-2.5 rounded-full bg-[#2E9E5B]"></span>
+<span>Crop</span>
+</button>
+<!-- Weed Button (Selected) -->
+<button id="d-btn-weed" onclick="assign('weed')" class="py-2 px-1 border-2 border-[#D2452B] bg-[#D2452B]/10 rounded text-center text-label-instrument font-label-instrument text-primary font-semibold flex flex-col items-center gap-1 min-h-[48px]">
+<span class="w-2.5 h-2.5 rounded-full bg-[#D2452B]"></span>
+<span>Weed</span>
+</button>
+<!-- Skip / Ignore Button -->
+<button id="d-btn-skip" onclick="assign('skip')" class="py-2 px-1 border border-outline-variant rounded text-center hover:bg-surface-container transition-colors text-label-instrument font-label-instrument text-on-surface-variant flex flex-col items-center gap-1 min-h-[48px]">
+<span class="w-2.5 h-2.5 rounded-full bg-outline"></span>
+<span>Skip</span>
+</button>
+</div>
+</div>
+<!-- Bounding Box Monospace Coordinates -->
+<div class="border-t border-outline-variant pt-space-xs space-y-1">
+<div class="text-label-instrument font-label-instrument text-on-surface-variant">GEOMETRIC MATRIX</div>
+<div class="grid grid-cols-4 gap-1 text-center font-metric-inline text-label-instrument">
+<div class="bg-surface-container-low p-1 rounded border border-outline-variant">
+<span class="text-on-surface-variant block text-[10px]">X</span>
+<span id="d-gx" class="text-primary font-medium">{{ first.box[0] }}</span>
+</div>
+<div class="bg-surface-container-low p-1 rounded border border-outline-variant">
+<span class="text-on-surface-variant block text-[10px]">Y</span>
+<span id="d-gy" class="text-primary font-medium">{{ first.box[1] }}</span>
+</div>
+<div class="bg-surface-container-low p-1 rounded border border-outline-variant">
+<span class="text-on-surface-variant block text-[10px]">WIDTH</span>
+<span id="d-gw" class="text-primary font-medium">{{ first.box[2] - first.box[0] }}</span>
+</div>
+<div class="bg-surface-container-low p-1 rounded border border-outline-variant">
+<span class="text-on-surface-variant block text-[10px]">HEIGHT</span>
+<span id="d-gh" class="text-primary font-medium">{{ first.box[3] - first.box[1] }}</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Action Confirmation Drawer inside right panel -->
+<div class="p-space-md border-t border-outline-variant bg-surface-container-low/50">
+<div class="flex items-center justify-between text-caption font-caption text-on-surface-variant">
+<span>JUDGE: SPARK-1.3</span>
+<span>MASKS: SAM-3.1</span>
+</div>
+</div>
+</aside>
+</div>
+<!-- BOTTOM WORKFLOW ACTION FOOTER -->
+<!-- Combines Primary Task Actions with Shared Component Telemetry OS status -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant px-gutter-desktop py-space-sm flex justify-between items-center z-40 shrink-0">
+<!-- Secondary & Navigation Navigation Actions -->
+<div class="flex items-center gap-space-md">
+{% if prev_url %}
+<a class="px-space-md py-2 border border-outline-variant rounded bg-surface-container-lowest hover:bg-surface-container text-body-strong font-body-strong text-primary transition-colors flex items-center gap-2" href="{{ prev_url }}">
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+<span>Previous Photo</span>
+</a>
+{% else %}
+<button disabled="" class="px-space-md py-2 border border-outline-variant rounded bg-surface-container text-outline text-body-strong font-body-strong flex items-center gap-2 cursor-not-allowed">
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_back</span>
+<span>Previous Photo</span>
+</button>
+{% endif %}
+
+</div>
+<!-- Central Key Shortcut Helper Notice -->
+<div class="hidden md:flex items-center gap-2 text-caption font-caption text-on-surface-variant">
+<kbd class="px-2 py-0.5 border border-outline-variant rounded bg-surface-container-low font-metric-inline text-label-instrument text-primary">Enter</kbd>
+<span>to commit{% if pos < total %} &amp; load Photo {{ pos + 1 }}{% endif %}</span>
+</div>
+<!-- Primary Action: Save & Next Photo -->
+<div class="flex items-center gap-space-sm">
+<button id="d-save-btn" onclick="saveLabels(this)" class="px-space-lg py-2.5 rounded bg-primary text-on-primary hover:opacity-90 transition-opacity font-body-strong text-body-strong flex items-center gap-2">
+<span id="d-save-label">Save and {{ next_label }}</span>
+<span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
+</button>
+</div>
+</footer>
+</div>
+<script id="ldata" type="application/json">{{ payload | safe }}</script>
+<script>
+const D = JSON.parse(document.getElementById('ldata').textContent);
+const NEXT = {crop: 'weed', weed: 'skip', skip: 'crop', unsure: 'crop'};
+const HEX = {crop: '#2E9E5B', weed: '#D2452B', unsure: '#E3A21A', skip: '#747874'};
+const CAP = {crop: 'Crop', weed: 'Weed', unsure: 'Unsure', skip: 'Skip'};
+const BOX_M = {
+  crop: ['border-2', 'border-[#2E9E5B]', 'bg-[#2E9E5B]/10'],
+  weed: ['border-[3px]', 'border-[#D2452B]', 'bg-[#D2452B]/15'],
+  unsure: ['border-2', 'border-dashed', 'border-[#E3A21A]', 'bg-[#E3A21A]/10'],
+  skip: ['border-2', 'border-[#747874]', 'bg-[#747874]/10']
+};
+const TAG_M = {
+  crop: ['bg-[#2E9E5B]', 'text-white'],
+  weed: ['bg-[#D2452B]', 'text-white'],
+  unsure: ['bg-[#E3A21A]', 'text-primary'],
+  skip: ['bg-[#747874]', 'text-white']
+};
+const BOX_D = {
+  crop: ['border-2', 'border-[#2E9E5B]', 'bg-[#2E9E5B]/10'],
+  weed: ['border-[3px]', 'border-[#D2452B]', 'bg-[#D2452B]/15'],
+  unsure: ['border-2', 'border-dashed', 'border-[#E3A21A]', 'bg-[#E3A21A]/10'],
+  skip: ['border-2', 'border-[#747874]', 'bg-[#747874]/10']
+};
+const HALO_D = {
+  crop: ['outline', 'outline-2', 'outline-offset-2', 'outline-[#2E9E5B]'],
+  weed: ['outline', 'outline-2', 'outline-offset-2', 'outline-[#D2452B]'],
+  unsure: ['outline', 'outline-2', 'outline-offset-2', 'outline-[#E3A21A]'],
+  skip: ['outline', 'outline-2', 'outline-offset-2', 'outline-[#747874]']
+};
+const TAG_D = {
+  crop: ['bg-[#2E9E5B]', 'text-white'],
+  weed: ['bg-[#D2452B]', 'text-white'],
+  unsure: ['bg-[#E3A21A]', 'text-white'],
+  skip: ['bg-[#747874]', 'text-white']
+};
+const BORDERS = ['border-2', 'border-[3px]', 'border-dashed', 'border-[#2E9E5B]', 'border-[#D2452B]', 'border-[#E3A21A]', 'border-[#747874]', 'bg-[#2E9E5B]/10', 'bg-[#D2452B]/15', 'bg-[#E3A21A]/10', 'bg-[#747874]/10', 'outline', 'outline-2', 'outline-offset-2', 'outline-[#2E9E5B]', 'outline-[#D2452B]', 'outline-[#E3A21A]', 'outline-[#747874]'];
+const TAGS = ['bg-[#2E9E5B]', 'bg-[#D2452B]', 'bg-[#E3A21A]', 'bg-[#747874]', 'text-white', 'text-primary'];
+const state = {}, tapped = {}, byId = {};
+D.objects.forEach(o => { state[o.id] = o.pre; byId[o.id] = o; });
+let selected = D.objects.length ? D.objects[0].id : null;
+const boxEls = {};
+document.querySelectorAll('.plant-box').forEach(el => {
+  const id = Number(el.dataset.id);
+  boxEls[id] = boxEls[id] || {};
+  boxEls[id][el.dataset.view] = el;
+});
+function paintBoxM(id) {
+  const el = (boxEls[id] || {}).m;
+  if (!el) return;
+  el.classList.remove(...BORDERS);
+  el.classList.add(...BOX_M[state[id]]);
+  const tag = el.querySelector('.box-tag');
+  tag.classList.remove(...TAGS);
+  tag.classList.add(...TAG_M[state[id]]);
+  tag.textContent = '[' + id + '] ' + state[id].toUpperCase();
+}
+function paintBoxD(id) {
+  const el = (boxEls[id] || {}).d;
+  if (!el) return;
+  el.classList.remove(...BORDERS);
+  el.classList.add(...BOX_D[state[id]]);
+  const tag = el.querySelector('.box-tag');
+  tag.classList.remove(...TAGS);
+  tag.classList.add(...TAG_D[state[id]]);
+  tag.textContent = '[' + id + '] ' + CAP[state[id]] + ' ' + byId[id].conf;
+  const handles = el.querySelector('.box-handles');
+  if (id === selected) {
+    el.classList.add(...HALO_D[state[id]]);
+    handles.classList.remove('hidden');
+    handles.querySelectorAll('.box-handle').forEach(h => {
+      h.classList.remove('border-[#2E9E5B]', 'border-[#D2452B]', 'border-[#E3A21A]', 'border-[#747874]');
+      h.classList.add('border-[' + HEX[state[id]] + ']');
+    });
+  } else {
+    handles.classList.add('hidden');
+  }
+}
+function paintButtons() {
+  const cur = state[selected];
+  ['crop', 'weed', 'skip'].forEach(l => {
+    const b = document.getElementById('btn-' + l);
+    const s = document.getElementById('sub-' + l);
+    const on = l === cur;
+    b.className = 'touch-target h-12 flex flex-col items-center justify-center border rounded transition-colors ' + (on ? 'border-2 border-primary bg-primary-container text-white ring-1 ring-primary' : 'border-[#DDE2DC] bg-surface-container-lowest text-on-surface');
+    s.className = 'font-metric-inline text-[9px] mt-0.5 ' + (on ? 'text-on-primary-container' : 'text-on-surface-variant');
+    s.textContent = on ? 'SELECTED' : (l === 'crop' ? 'KEY: [1]' : (l === 'weed' ? 'KEY: [2]' : 'NO ACTION'));
+    const db = document.getElementById('d-btn-' + l);
+    db.className = 'py-2 px-1 rounded text-center text-label-instrument font-label-instrument flex flex-col items-center gap-1 min-h-[48px] ' + (on ? 'border-2 text-primary font-semibold border-[' + HEX[l] + '] bg-[' + HEX[l] + ']/10' : 'border border-outline-variant hover:bg-surface-container transition-colors text-on-surface');
+  });
+}
+function updateCounts() {
+  const c = {crop: 0, weed: 0, unsure: 0};
+  let changed = 0;
+  D.objects.forEach(o => {
+    if (c[state[o.id]] !== undefined) c[state[o.id]]++;
+    if (state[o.id] !== o.pre) changed++;
+  });
+  document.getElementById('m-crop').textContent = c.crop;
+  document.getElementById('m-weed').textContent = c.weed;
+  document.getElementById('m-unsure').textContent = c.unsure;
+  document.getElementById('m-changed').textContent = changed + ' edited';
+  document.getElementById('d-m-crop').textContent = c.crop;
+  document.getElementById('d-m-weed').textContent = c.weed;
+  document.getElementById('d-m-unsure').textContent = c.unsure;
+  document.getElementById('d-m-changed').textContent = changed + ' CHANGED';
+  document.getElementById('d-updated').textContent = 'You updated ' + changed + ' tags from AI baseline';
+}
+function updateInspector() {
+  if (selected === null) return;
+  const o = byId[selected];
+  const lab = state[selected];
+  document.getElementById('insp-id').textContent = 'ID: #' + o.id;
+  document.getElementById('insp-xy').textContent = 'X: ' + o.cx + ' | Y: ' + o.cy;
+  document.getElementById('insp-title').textContent = 'Plant #' + o.id + ': ' + lab;
+  document.getElementById('insp-sub').textContent = 'Spark: ' + o.reason;
+  const conf = document.getElementById('insp-conf');
+  conf.textContent = o.conf + ' conf';
+  conf.className = 'font-metric-inline text-[13px] font-semibold ' + (lab === 'weed' ? 'text-[#D2452B]' : (lab === 'crop' ? 'text-[#2E9E5B]' : 'text-[#E3A21A]'));
+  const dot = document.getElementById('d-dot');
+  dot.classList.remove('bg-[#2E9E5B]', 'bg-[#D2452B]', 'bg-[#E3A21A]', 'bg-[#747874]');
+  dot.classList.add('bg-[' + HEX[lab] + ']');
+  document.getElementById('d-title').textContent = 'Tag #' + o.id + ' ' + CAP[lab];
+  document.getElementById('d-thumb').src = '/closeup/' + D.key + '/' + o.id;
+  const ai = document.getElementById('d-ai');
+  ai.textContent = CAP[lab] + ' ' + o.conf;
+  ai.classList.remove('text-[#2E9E5B]', 'text-[#D2452B]', 'text-[#E3A21A]', 'text-[#747874]');
+  ai.classList.add('text-[' + HEX[lab] + ']');
+  const pct = parseInt(o.conf, 10) || 0;
+  const meter = document.getElementById('d-meter');
+  meter.style.width = pct + '%';
+  meter.classList.remove('bg-[#2E9E5B]', 'bg-[#D2452B]', 'bg-[#E3A21A]', 'bg-[#747874]');
+  meter.classList.add('bg-[' + HEX[lab] + ']');
+  document.getElementById('d-latin').textContent = 'Spark: ' + o.pre;
+  document.getElementById('d-conflevel').textContent = pct >= 85 ? 'HIGH CONFIDENCE' : (pct >= 60 ? 'MEDIUM' : 'LOW');
+  document.getElementById('d-cues').textContent = '"' + o.reason + '"';
+  document.getElementById('d-gx').textContent = o.box[0];
+  document.getElementById('d-gy').textContent = o.box[1];
+  document.getElementById('d-gw').textContent = o.box[2] - o.box[0];
+  document.getElementById('d-gh').textContent = o.box[3] - o.box[1];
+}
+function refresh(id, prev) {
+  paintBoxM(id); paintBoxD(id);
+  if (prev !== null && prev !== id) paintBoxD(prev);
+  updateCounts(); updateInspector(); paintButtons();
+}
+// Undo/redo history: each entry is one label change on one plant.
+const undoStack = [], redoStack = [];
+function paintHistory() {
+  document.getElementById('tb-undo').disabled = !undoStack.length;
+  document.getElementById('tb-redo').disabled = !redoStack.length;
+}
+function setLabel(id, label) {
+  if (state[id] === label && tapped[id]) return;
+  undoStack.push({id, from: state[id], to: label, wasTapped: !!tapped[id]});
+  redoStack.length = 0;
+  const prev = selected;
+  selected = id;
+  state[id] = label;
+  tapped[id] = true;
+  refresh(id, prev);
+  paintHistory();
+}
+function stepHistory(from, to, undo) {
+  const h = from.pop();
+  if (!h) return;
+  to.push(h);
+  const prev = selected;
+  selected = h.id;
+  state[h.id] = undo ? h.from : h.to;
+  if (undo && !h.wasTapped) delete tapped[h.id]; else tapped[h.id] = true;
+  refresh(h.id, prev);
+  paintHistory();
+}
+function tapPlant(id) { setLabel(id, NEXT[state[id]]); }
+function assign(label) {
+  if (selected === null) return;
+  setLabel(selected, label);
+}
+// Zoom + pan for the desktop canvas; boxes live inside #d-fit so they follow.
+const view = {z: 1, x: 0, y: 0, pan: false};
+function paintView() {
+  const fit = document.getElementById('d-fit');
+  const cv = document.getElementById('d-canvas');
+  const maxX = cv.clientWidth * (view.z - 1), maxY = fit.offsetHeight * (view.z - 1);
+  view.x = Math.min(0, Math.max(-maxX, view.x));
+  view.y = Math.min(0, Math.max(-maxY, view.y));
+  fit.style.transformOrigin = '0 0';
+  fit.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.z})`;
+  document.getElementById('tb-zoom').textContent = Math.round(view.z * 100) + '%';
+  cv.style.cursor = view.pan ? 'grab' : '';
+}
+function zoomBy(f) {
+  const cv = document.getElementById('d-canvas');
+  const cx = cv.clientWidth / 2, cy = cv.clientHeight / 2;
+  const z = Math.min(4, Math.max(1, view.z * f));
+  view.x = cx - (cx - view.x) * (z / view.z);
+  view.y = cy - (cy - view.y) * (z / view.z);
+  view.z = z;
+  paintView();
+}
+document.getElementById('tb-zoomin').addEventListener('click', () => zoomBy(1.25));
+document.getElementById('tb-zoomout').addEventListener('click', () => zoomBy(0.8));
+document.getElementById('tb-pan').addEventListener('click', e => {
+  view.pan = !view.pan;
+  e.currentTarget.setAttribute('aria-pressed', view.pan);
+  e.currentTarget.classList.toggle('bg-surface-container-high', view.pan);
+  paintView();
+});
+document.getElementById('tb-undo').addEventListener('click', () => stepHistory(undoStack, redoStack, true));
+document.getElementById('tb-redo').addEventListener('click', () => stepHistory(redoStack, undoStack, false));
+(function () {
+  const cv = document.getElementById('d-canvas');
+  let drag = null;
+  cv.addEventListener('pointerdown', e => {
+    if (!view.pan || e.target.closest('button')) return;
+    drag = {x: e.clientX - view.x, y: e.clientY - view.y};
+    cv.setPointerCapture(e.pointerId);
+    cv.style.cursor = 'grabbing';
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!drag) return;
+    view.x = e.clientX - drag.x; view.y = e.clientY - drag.y;
+    paintView();
+  });
+  cv.addEventListener('pointerup', () => { drag = null; paintView(); });
+  // In pan mode a click moves the photo; it never relabels a plant.
+  cv.addEventListener('click', e => {
+    if (view.pan && e.target.closest('.plant-box')) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
+})();
+let saving = false;
+async function saveLabels(btn) {
+  if (saving) return;
+  saving = true;
+  document.getElementById('save-btn').disabled = true;
+  document.getElementById('d-save-btn').disabled = true;
+  document.getElementById('save-label').textContent = 'Saving…';
+  document.getElementById('d-save-label').textContent = 'Saving…';
+  const res = await fetch('/api/save', {method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({key: D.key, labels: state,
+      tapped: Object.keys(tapped).map(Number)})});
+  const j = await res.json();
+  if (!res.ok) {
+    document.getElementById('save-label').textContent = 'Error: ' + j.error;
+    document.getElementById('d-save-label').textContent = 'Error: ' + j.error;
+    document.getElementById('save-btn').disabled = false;
+    document.getElementById('d-save-btn').disabled = false;
+    saving = false;
+    return;
+  }
+  const msg = 'Saved ✓ (' + j.changed + '/' + j.total + ' changed)';
+  document.getElementById('save-label').textContent = msg;
+  document.getElementById('d-save-label').textContent = msg;
+  setTimeout(() => { location = j.next; }, 900);
+}
+function fsToggle(id) {
+  const el = document.getElementById(id);
+  if (document.fullscreenElement) document.exitFullscreen();
+  else if (el.requestFullscreen) el.requestFullscreen();
+}
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') { e.preventDefault(); stepHistory(undoStack, redoStack, true); return; }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') { e.preventDefault(); stepHistory(redoStack, undoStack, false); return; }
+  if (e.key === '1') assign('crop');
+  else if (e.key === '2') assign('weed');
+  else if (e.key === '3') assign('skip');
+  else if (e.key === 'Enter') {
+    const db = document.getElementById('d-save-btn');
+    saveLabels((db && db.offsetParent !== null) ? db : document.getElementById('save-btn'));
+  }
+});
+D.objects.forEach(o => { paintBoxM(o.id); paintBoxD(o.id); });
+if (selected !== null) { updateCounts(); updateInspector(); paintButtons(); }
+</script>
+</body></html>

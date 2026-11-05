@@ -1,0 +1,51 @@
+{% set title = 'OpenWeeder — Preparing' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 py-space-sm flex items-center gap-space-xs sticky top-0 z-40">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<span class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</span>
+<span class="text-outline-variant">/</span>
+<span class="font-caption text-caption text-on-surface-variant">{{ field }}</span>
+</header>
+<main class="w-full max-w-[720px] mx-auto px-4 py-space-lg flex-1 flex flex-col justify-center">
+<div class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<div class="flex items-center gap-3">
+<span class="w-3 h-3 rounded-full bg-secondary animate-pulse"></span>
+<h1 class="font-page-title-mobile text-page-title-mobile text-primary">Preparing {{ jids|length }} photo(s)…</h1>
+</div>
+<p class="font-body-default text-body-default text-on-surface-variant mt-2">Finding plants and asking Spark for first labels. About a minute per photo — keep this page open.</p>
+<div class="mt-4 flex flex-col gap-2">
+{% for j in jids %}
+<div id="row-{{ j }}" class="flex items-center justify-between border border-[#DDE2DC] rounded-lg px-3 py-2 min-h-[48px]">
+<span class="font-body-strong text-body-strong text-primary">Photo {{ loop.index }}</span>
+<span class="st font-metric-inline text-metric-inline text-on-surface-variant">working…</span>
+</div>
+{% endfor %}
+</div>
+<p id="err" class="font-body-default text-body-default text-error mt-3"></p>
+</div>
+</main>
+<script>
+const jids = {{ jids | tojson }};
+async function poll() {
+  let urls = [];
+  for (const id of jids) {
+    const r = await fetch('/api/job/' + id);
+    const j = await r.json();
+    const row = document.querySelector('#row-' + id + ' .st');
+    if (j.status === 'done') {
+      row.textContent = 'ready ✓';
+      row.className = 'st font-metric-inline text-metric-inline text-secondary';
+      urls.push(j.url);
+    } else if (j.status === 'error') {
+      document.getElementById('err').textContent = 'Preparation failed: ' + j.error;
+      return;
+    }
+  }
+  if (urls.length === jids.length) { location = urls[0]; return; }
+  setTimeout(poll, 2000);
+}
+poll();
+</script>
+</body></html>

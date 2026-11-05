@@ -1,0 +1,18 @@
+{% set title = 'OpenWeeder — Error' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<main class="w-full max-w-[720px] mx-auto px-4 py-space-lg flex-1 flex flex-col justify-center">
+<div class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error text-3xl">error</span>
+<h1 class="font-page-title-mobile text-page-title-mobile text-primary">Something went wrong</h1>
+</div>
+<p class="font-body-default text-body-default text-on-surface-variant mt-2">{{ msg }}</p>
+<a class="inline-flex items-center gap-2 mt-4 px-space-md py-2 border border-outline-variant rounded bg-surface-container-lowest hover:bg-surface-container text-body-strong font-body-strong text-primary min-h-[48px]" href="{{ back }}">
+<span class="material-symbols-outlined">arrow_back</span>
+<span>Back</span>
+</a>
+</div>
+</main>
+</body></html>

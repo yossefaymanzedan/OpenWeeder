@@ -1,0 +1,40 @@
+{% set title = 'OpenWeeder — Learning' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+{% set P = field_plan(field if field is defined else None) %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span class="text-outline-variant">/</span>
+<a href="/field/{{ field }}" class="hover:text-primary">{{ field }}</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-body-strong">Learning</span>
+</nav>
+<span class="px-space-xs py-0.5 bg-surface-container-low border border-[#DDE2DC] rounded font-label-instrument text-label-instrument text-on-surface-variant">STEP 4 OF 4 · LEARNING</span>
+</header>
+<main class="w-full max-w-[1200px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+<div id="panel">{% include '_learning_panel.html' %}</div>
+</main>
+<script>
+const FIELD = '{{ field }}';
+// Live: while learning runs, re-render the panel from the server every 2.5 s.
+async function refresh() {
+  try {
+    const html = await (await fetch('/field/' + FIELD + '/learning?partial=1')).text();
+    const panel = document.getElementById('panel');
+    const open = [...panel.querySelectorAll('details[open]')].map(d => d.dataset.key);
+    panel.innerHTML = html;
+    open.forEach(k => { const d = panel.querySelector(`details[data-key="${k}"]`); if (d) d.open = true; });
+    if (panel.querySelector('[data-running="1"]')) setTimeout(refresh, 2500);
+  } catch (e) { setTimeout(refresh, 5000); }
+}
+if (document.querySelector('[data-running="1"]')) setTimeout(refresh, 2500);
+// Arriving straight from labeling (?auto=1): start learning by itself.
+const auto = document.getElementById('learn-form');
+if (auto && new URLSearchParams(location.search).get('auto') === '1') {
+  history.replaceState(null, '', location.pathname);
+  auto.submit();
+}
+</script>
+</body></html>

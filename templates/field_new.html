@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder — New crop: Basics (Step 1 of 4)</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#020603",
+            "surface-bright": "#f2fcf3",
+            "primary-fixed": "#dce5dc",
+            "primary-container": "#18201b",
+            "inverse-surface": "#29332d",
+            "surface-container-low": "#ecf6ed",
+            "error-container": "#ffdad6",
+            "surface-container-highest": "#dbe5dc",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#279856",
+            "on-secondary-fixed": "#002110",
+            "tertiary-fixed": "#8df9ac",
+            "tertiary-container": "#00240e",
+            "on-primary-fixed": "#151d18",
+            "secondary-container": "#9bf2bb",
+            "on-secondary-fixed-variant": "#00522f",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed-variant": "#404943",
+            "secondary-fixed": "#9ef5be",
+            "tertiary": "#000602",
+            "on-surface": "#141e18",
+            "on-secondary": "#ffffff",
+            "background": "#f2fcf3",
+            "surface": "#f2fcf3",
+            "surface-tint": "#58605a",
+            "outline-variant": "#c4c8c2",
+            "outline": "#747874",
+            "primary-fixed-dim": "#c0c9c1",
+            "on-tertiary-fixed-variant": "#005229",
+            "surface-variant": "#dbe5dc",
+            "on-background": "#141e18",
+            "secondary": "#066c41",
+            "surface-container": "#e6f1e7",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#71dc92",
+            "inverse-primary": "#c0c9c1",
+            "on-tertiary-fixed": "#00210d",
+            "secondary-fixed-dim": "#82d8a3",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e0ebe2",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#e9f3ea",
+            "surface-dim": "#d2ddd4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#107145",
+            "on-surface-variant": "#434844"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "1.25rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.5rem",
+            "space-2xs": "0.25rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "section-title": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "body-strong": ["IBM Plex Sans"],
+            "metric-display-mobile": ["JetBrains Mono"],
+            "page-title": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "section-title": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "label-instrument": ["12px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "caption": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "metric-inline": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "body-default": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-strong": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "metric-display-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+      font-size: 18px;
+      line-height: 1;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    /* Technical crosshair & grid patterns */
+    .bg-grid-tech {
+      background-size: 20px 20px;
+      background-image: 
+        linear-gradient(to right, rgba(196, 200, 194, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(196, 200, 194, 0.35) 1px, transparent 1px);
+    }
+    .style-card:has(> input[name=planting_style]:checked) {
+      border: 2px solid #066c41;
+      background: #ecf6ed;
+    }
+  </style>
+</head>
+<body class="bg-surface text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default selection:bg-secondary selection:text-on-secondary">
+{% include '_nav.html' %}
+{% set P = field_plan(field if field is defined else None) %}
+<!-- ========================================================================= -->
+<!-- SIDE NAVIGATION (Shared Component Anchor)                                 -->
+<!-- ========================================================================= -->
+<!-- ========================================================================= -->
+<!-- TOP NAVIGATION BAR (Contextual Breadcrumbs & Global Rig Actions)          -->
+<!-- ========================================================================= -->
+<header class="flex justify-between items-center w-full px-4 lg:px-gutter-desktop py-space-sm border-b border-outline-variant bg-surface-container-lowest z-30 sticky top-0 flex-wrap gap-2">
+<!-- Breadcrumb Pathway -->
+<div class="flex items-center gap-space-sm">
+<div class="flex items-center gap-space-2xs text-body-strong font-body-strong text-on-surface-variant">
+<a class="hover:text-primary" href="/#crops">Crops</a>
+<span class="text-outline-variant font-mono">/</span>
+<span class="text-primary font-semibold flex items-center gap-space-2xs">
+<span class="material-symbols-outlined text-secondary" data-icon="add_circle">add_circle</span>
+          + New crop
+        </span>
+<span class="px-space-xs py-0.5 rounded-lg bg-surface-container text-on-surface-variant text-label-instrument font-label-instrument border border-outline-variant">
+          Step 1 of 4: Basics
+        </span>
+</div>
+</div>
+<!-- Right Controls: Status & Utility -->
+<div class="flex items-center gap-space-md">
+
+<!-- Language Switch -->
+
+<!-- Trailing Action Icons -->
+<div class="hidden md:flex items-center border-l border-outline-variant pl-space-md gap-space-xs text-on-surface-variant">
+
+
+
+</div>
+<!-- Emergency E-Stop button -->
+
+</div>
+</header>
+<!-- ========================================================================= -->
+<!-- MAIN WORKSPACE CANVAS (Two-Column Layout 1440px Desktop)                   -->
+<!-- ========================================================================= -->
+<main class="flex-1 pb-16 px-4 lg:px-gutter-desktop pt-space-lg max-w-[1440px]">
+<!-- Top Step Progress Tracker -->
+<div class="mb-space-lg bg-surface-container-lowest border border-outline-variant rounded-lg p-space-sm flex items-center justify-between">
+<div class="flex items-center gap-space-lg w-full">
+<!-- Step 1 (Active) -->
+<div class="flex items-center gap-space-xs flex-1">
+<div class="w-6 h-6 rounded-lg bg-primary-container text-surface-container-lowest flex items-center justify-center text-label-instrument font-metric-inline font-bold">1</div>
+<div class="flex flex-col">
+<span class="text-label-instrument font-label-instrument text-primary font-bold">1. BASICS</span>
+<span class="text-caption font-caption text-secondary">Name, crop, rows</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant flex-1"></div>
+<!-- Step 2 -->
+<div class="flex items-center gap-space-xs opacity-50 flex-1">
+<div class="w-6 h-6 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">2</div>
+<div class="flex flex-col">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant font-medium">2. PHOTO GUIDE</span>
+<span class="text-caption font-caption text-on-surface-variant">Do &amp; don't</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant flex-1"></div>
+<!-- Step 3 -->
+<div class="flex items-center gap-space-xs opacity-50 flex-1">
+<div class="w-6 h-6 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">3</div>
+<div class="flex flex-col">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant font-medium">3. UPLOAD &amp; LABEL</span>
+<span class="text-caption font-caption text-on-surface-variant">{{ P.photos }} photos, label {{ P.label }}</span>
+</div>
+</div>
+<div class="h-px bg-outline-variant flex-1"></div>
+<!-- Step 4 -->
+<div class="flex items-center gap-space-xs opacity-50 flex-1">
+<div class="w-6 h-6 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">4</div>
+<div class="flex flex-col">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant font-medium">4. TEST &amp; CONFIRM</span>
+<span class="text-caption font-caption text-on-surface-variant">AI checks {{ P.test }} photos</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Master 2-Column Grid -->
+<form method="post" action="/crop/new" class="grid grid-cols-12 gap-space-lg items-start">
+<!-- ===================================================================== -->
+<!-- LEFT COLUMN: Input Parameters & Form Controls (Cols 1-7)               -->
+<!-- ===================================================================== -->
+<section class="col-span-12 lg:col-span-7 flex flex-col gap-space-lg">
+<!-- CARD: Primary Field Definition -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-space-md py-space-sm border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<h2 class="text-section-title font-section-title text-primary flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="edit_note">edit_note</span>
+              Your crop
+            </h2>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<!-- Field Name Input -->
+<div class="flex flex-col gap-space-2xs">
+<label class="text-label-instrument font-label-instrument text-primary flex items-center justify-between" for="field-name">
+<span>NAME</span>
+<span class="text-on-surface-variant font-normal">REQUIRED</span>
+</label>
+<div class="relative">
+<input name="name" required minlength="2" maxlength="40" pattern="[A-Za-z0-9][A-Za-z0-9_\-]{1,40}" title="Letters, numbers, - and _ only" class="w-full bg-surface-container-lowest border border-outline-variant rounded-lg px-space-sm py-2 text-body-strong font-body-strong text-primary focus:border-secondary focus:ring-0 focus:outline-none transition-colors" id="field-name" type="text" placeholder="e.g. tomato-rows" />
+</div>
+<p class="text-caption font-caption text-on-surface-variant">
+                Letters, numbers, - and _ only, e.g. tomato-rows. You pick this crop later when you create a field.
+              </p>
+</div>
+<!-- Crop Selector & Quick Chips -->
+<div class="flex flex-col gap-space-2xs">
+<label class="text-label-instrument font-label-instrument text-primary flex items-center justify-between">
+<span>CROP TYPE</span>
+<span class="text-on-surface-variant font-normal">REQUIRED</span>
+</label>
+<!-- Searchable crop input backed by trained crops -->
+<div class="relative">
+<input name="crop" id="crop-input" list="crop-list" required placeholder="e.g. carrot" autocomplete="off" class="w-full bg-surface-container-lowest border border-secondary rounded-lg px-space-sm py-2.5 text-body-strong font-body-strong text-primary focus:ring-0 focus:outline-none" />
+<datalist id="crop-list">
+{% for c in crops %}<option value="{{ c }}">{% endfor %}
+</datalist>
+</div>
+<!-- Quick Selection Crop Chips -->
+<div class="flex flex-wrap items-center gap-space-xs mt-1">
+<span class="text-label-instrument font-label-instrument text-on-surface-variant">Quick pick:</span>
+{% for c in crops[:6] %}
+<button type="button" onclick="document.getElementById('crop-input').value='{{ c }}'" class="px-space-xs py-1 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface-variant text-label-instrument font-label-instrument hover:border-primary hover:text-primary transition-colors min-h-[44px]">
+                  {{ c }}
+                </button>
+{% else %}
+<button type="button" onclick="document.getElementById('crop-input').value='carrot'" class="px-space-xs py-1 rounded-lg border border-outline-variant bg-surface-container-lowest text-on-surface-variant text-label-instrument font-label-instrument hover:border-primary hover:text-primary transition-colors min-h-[44px]">
+                  Carrot
+                </button>
+{% endfor %}
+</div>
+</div>
+<!-- Variety / Cultivar Tag -->
+<div class="flex flex-col gap-space-2xs">
+<label class="text-label-instrument font-label-instrument text-primary" for="cultivar">
+                VARIETY (OPTIONAL)
+              </label>
+<div class="flex items-center gap-space-xs">
+<input name="cultivar" class="flex-1 bg-surface-container-lowest border border-outline-variant rounded-lg px-space-sm py-2 text-body-default font-body-default text-primary focus:border-secondary focus:ring-0 focus:outline-none font-mono" id="cultivar" type="text" placeholder="e.g. variety name (optional)" />
+</div>
+</div>
+</div>
+</div>
+<!-- CARD: Planting Style & Row Geometry Radio Grid Cards -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-space-md py-space-sm border-b border-outline-variant flex items-center justify-between bg-surface-container-low">
+<h2 class="text-section-title font-section-title text-primary flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary" data-icon="straighten">straighten</span>
+              Planting style
+            </h2>
+</div>
+<div class="p-space-md flex flex-col gap-space-md">
+<p class="text-caption font-caption text-on-surface-variant">
+              How the crop is planted. Saved with the crop for setting up the robot, which drives along one row.
+            </p>
+<!-- Radio Option 1: Selected -->
+<label class="style-card cursor-pointer border border-outline-variant bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-md flex items-start gap-space-md transition-all">
+<input checked="" value="single" class="mt-1 text-secondary focus:ring-secondary focus:ring-offset-0 w-4 h-4" name="planting_style" type="radio"/>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-body-strong font-body-strong text-primary">Single row</span>
+<span class="px-space-xs py-0.5 rounded-lg bg-secondary text-on-secondary text-label-instrument font-label-instrument font-semibold uppercase">Recommended</span>
+</div>
+<p class="text-caption font-caption text-on-surface-variant mt-0.5">
+                  One straight line of crop plants. This is what the robot is built for.
+                </p>
+</div>
+</label>
+<!-- Radio Option 2 -->
+<label class="style-card cursor-pointer border border-outline-variant bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-md flex items-start gap-space-md transition-all">
+<input value="double" class="mt-1 text-secondary focus:ring-secondary focus:ring-offset-0 w-4 h-4" name="planting_style" type="radio"/>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-body-strong font-body-strong text-primary">Double row on a raised bed</span>
+</div>
+<p class="text-caption font-caption text-on-surface-variant mt-0.5">
+                  Two lines of crop on one bed.
+                </p>
+</div>
+</label>
+<!-- Radio Option 3 -->
+<label class="style-card cursor-pointer border border-outline-variant bg-surface-container-lowest hover:bg-surface-container rounded-lg p-space-md flex items-start gap-space-md transition-all">
+<input value="scattered" class="mt-1 text-secondary focus:ring-secondary focus:ring-offset-0 w-4 h-4" name="planting_style" type="radio"/>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<span class="text-body-strong font-body-strong text-primary">Scattered (no rows)</span>
+</div>
+<p class="text-caption font-caption text-on-surface-variant mt-0.5">
+                  Seed spread by hand or broadcast, no clear lines.
+                </p>
+</div>
+</label>
+</div>
+</div>
+<!-- Action Continuation Bar -->
+<div class="flex items-center justify-between pt-space-xs">
+<a class="text-on-surface-variant hover:text-primary px-space-md py-2.5 text-body-default font-body-default flex items-center gap-space-2xs" href="/">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+            Cancel
+          </a>
+<!-- Primary CTA Button -->
+<button type="submit" class="bg-primary-container text-on-primary hover:bg-black px-space-xl py-3 rounded-lg text-body-strong font-body-strong font-medium flex items-center gap-space-xs transition-colors shadow-none cursor-pointer min-h-[52px]">
+<span>Continue to Photo Guide</span>
+<span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</section>
+<section class="col-span-12 lg:col-span-5 flex flex-col gap-space-lg">
+<div class="bg-surface-container-lowest border border-outline-variant rounded-xl overflow-hidden">
+<div class="px-space-md py-space-sm border-b border-outline-variant bg-surface-container-low">
+<h2 class="text-section-title font-section-title text-primary flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-secondary">route</span>
+              What happens next
+            </h2>
+</div>
+<ol class="p-space-md flex flex-col gap-space-md">
+<li class="flex gap-space-sm">
+<span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">2</span>
+<div><div class="text-body-strong font-body-strong text-primary">Photo guide</div>
+<p class="text-caption font-caption text-on-surface-variant">How to take overhead photos the AI can read.</p></div>
+</li>
+<li class="flex gap-space-sm">
+<span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">3</span>
+<div><div class="text-body-strong font-body-strong text-primary">Upload &amp; label</div>
+<p class="text-caption font-caption text-on-surface-variant">Upload {{ P.photos }} photos of this crop. Pick {{ P.label }}: the AI guesses crop or weed for every plant and you tap the wrong ones to fix them.</p></div>
+</li>
+<li class="flex gap-space-sm">
+<span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument font-metric-inline">4</span>
+<div><div class="text-body-strong font-body-strong text-primary">Test &amp; confirm</div>
+<p class="text-caption font-caption text-on-surface-variant">The AI labels the other {{ P.test }} photos on its own. You fix mistakes, add notes, re-run, and confirm when it looks right.</p></div>
+</li>
+</ol>
+<p class="px-space-md pb-space-md text-caption font-caption text-on-surface-variant">Each photo the AI checks costs about 1&ndash;2 cents in AI calls.</p>
+</div>
+</section>
+</div>
+</form>
+</main>
+</body></html>

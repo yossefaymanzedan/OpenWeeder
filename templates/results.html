@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWeeder — Check the results (Step 4 of 4)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "primary": "#020603",
+            "surface-bright": "#f2fcf3",
+            "primary-fixed": "#dce5dc",
+            "primary-container": "#18201b",
+            "inverse-surface": "#29332d",
+            "surface-container-low": "#ecf6ed",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "on-tertiary-container": "#279856",
+            "on-secondary-fixed": "#002110",
+            "tertiary-fixed": "#8df9ac",
+            "tertiary-container": "#00240e",
+            "on-primary-fixed": "#151d18",
+            "secondary-container": "#9bf2bb",
+            "on-secondary-fixed-variant": "#00522f",
+            "on-primary-container": "#7f8881",
+            "on-primary-fixed-variant": "#404943",
+            "secondary-fixed": "#9ef5be",
+            "tertiary": "#000602",
+            "on-surface": "#141e18",
+            "on-secondary": "#ffffff",
+            "background": "#f5f6f3",
+            "surface": "#f5f6f3",
+            "surface-tint": "#58605a",
+            "outline-variant": "#dde2dc",
+            "outline": "#747874",
+            "primary-fixed-dim": "#c0c9c1",
+            "on-tertiary-fixed-variant": "#005229",
+            "surface-variant": "#dbe5dc",
+            "on-background": "#141e18",
+            "secondary": "#066c41",
+            "surface-container": "#e6f1e7",
+            "on-tertiary": "#ffffff",
+            "tertiary-fixed-dim": "#71dc92",
+            "inverse-primary": "#c0c9c1",
+            "on-tertiary-fixed": "#00210d",
+            "secondary-fixed-dim": "#82d8a3",
+            "on-error-container": "#93000a",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-high": "#e0ebe2",
+            "error": "#ba1a1a",
+            "inverse-on-surface": "#e9f3ea",
+            "surface-dim": "#d2ddd4",
+            "on-primary": "#ffffff",
+            "on-secondary-container": "#107145",
+            "on-surface-variant": "#434844"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.125rem",
+            "lg": "0.25rem",
+            "xl": "0.5rem",
+            "full": "0.75rem"
+          },
+          "spacing": {
+            "gutter-tablet": "1.25rem",
+            "space-xl": "2rem",
+            "space-md": "1rem",
+            "gutter-desktop": "1.5rem",
+            "margin-tablet": "1.5rem",
+            "gutter": "1rem",
+            "space-2xl": "3rem",
+            "margin-desktop": "2rem",
+            "space-xs": "0.5rem",
+            "space-2xs": "0.25rem",
+            "space-sm": "0.75rem",
+            "space-lg": "1.5rem",
+            "margin": "1rem"
+          },
+          "fontFamily": {
+            "section-title": ["IBM Plex Sans"],
+            "label-instrument": ["IBM Plex Sans"],
+            "metric-display": ["JetBrains Mono"],
+            "caption": ["IBM Plex Sans"],
+            "metric-inline": ["JetBrains Mono"],
+            "body-default": ["IBM Plex Sans"],
+            "body-strong": ["IBM Plex Sans"],
+            "metric-display-mobile": ["JetBrains Mono"],
+            "page-title": ["IBM Plex Sans"],
+            "page-title-mobile": ["IBM Plex Sans"]
+          },
+          "fontSize": {
+            "section-title": ["18px", { "lineHeight": "24px", "letterSpacing": "-0.005em", "fontWeight": "600" }],
+            "label-instrument": ["12px", { "lineHeight": "16px", "letterSpacing": "0.06em", "fontWeight": "600" }],
+            "metric-display": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+            "caption": ["13px", { "lineHeight": "18px", "fontWeight": "400" }],
+            "metric-inline": ["14px", { "lineHeight": "20px", "fontWeight": "500" }],
+            "body-default": ["15px", { "lineHeight": "22px", "fontWeight": "400" }],
+            "body-strong": ["15px", { "lineHeight": "22px", "fontWeight": "600" }],
+            "metric-display-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title": ["28px", { "lineHeight": "36px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+            "page-title-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    body {
+      background-color: #F5F6F3;
+      color: #141E18;
+      font-family: 'IBM Plex Sans', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    .cbox-layer { position: absolute; inset: 0; }
+    .cbox-layer.hide { display: none; }
+    .cbox { position: absolute; border: 2px solid #E3A21A; background: #E3A21A1f; }
+    .cbox[data-label=crop] { border-color: #2E9E5B; background: #2E9E5B26; }
+    .cbox[data-label=weed] { border-color: #D2452B; background: #D2452B26; }
+    .cbox.changed { outline: 2px dashed #fff; outline-offset: 1px; }
+    .cbox i { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; margin: -4px; border-radius: 50%; background: #D2452B; border: 2px solid #fff; }
+  </style>
+</head>
+<body class="bg-background text-on-surface antialiased min-h-screen flex flex-col justify-between select-none">
+{% include '_nav.html' %}
+{% set P = field_plan(field if field is defined else None) %}
+<!-- TOP INSTRUMENT NAV BAR (Shared Components JSON execution) -->
+<header class="flex justify-between items-center w-full px-4 lg:px-gutter-desktop py-space-sm border-b border-outline-variant bg-surface-container-lowest z-30 flex-wrap gap-2">
+<div class="flex items-center gap-space-lg">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-primary inline-block"></span>
+<span class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</span>
+</div>
+<div class="h-4 w-[1px] bg-outline-variant"></div>
+<!-- Breadcrumb Hierarchy -->
+<nav class="flex items-center gap-space-xs text-caption font-caption text-on-surface-variant">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span>/</span>
+<a href="/field/{{ field }}" class="text-on-surface font-medium hover:text-primary">{{ field }}</a>
+<span>/</span>
+<span class="text-primary font-semibold">Check the results (Step 4 of 4)</span>
+</nav>
+</div>
+<!-- Status, Language Parity & Trailing Actions -->
+<div class="flex items-center gap-space-md">
+<!-- Status Chip -->
+<div class="bg-surface-container-lowest border border-outline-variant rounded px-space-xs py-space-2xs flex items-center gap-space-2xs">
+{% if results and results.get('confirmed') %}<span class="w-1.5 h-1.5 rounded-full bg-[#2E9E5B]"></span>{% elif results %}<span class="w-1.5 h-1.5 rounded-full bg-[#2E9E5B]"></span>{% else %}<span class="w-1.5 h-1.5 rounded-full bg-[#E3A21A]"></span>{% endif %}
+<span class="text-label-instrument font-label-instrument text-on-surface tracking-wider">{% if results and results.get('confirmed') %}VERIFIED{% elif results %}EVALUATED — REVIEW{% else %}NO RUN YET{% endif %}</span>
+</div>
+<!-- Bilingual Arabic Parity Selector -->
+
+<div class="h-4 w-[1px] bg-outline-variant"></div>
+<!-- Instrument Diagnostic Actions -->
+<div class="flex items-center gap-space-xs">
+
+
+</div>
+<!-- Calibration & Emergency Stop Primary/Secondary Actions from JSON -->
+<div class="flex items-center gap-space-xs ml-space-xs">
+
+
+</div>
+</div>
+</header>
+<!-- WORKSPACE CANVAS (1440px Desktop Utilitarian Layout) -->
+<main class="w-full max-w-[1440px] mx-auto px-4 lg:px-margin-desktop py-space-md flex-1 flex flex-col gap-space-md">
+<!-- TOP SUMMARY METRICS BAR (Stacked Monospace Readouts) -->
+<section class="grid grid-cols-2 lg:grid-cols-4 gap-space-md bg-surface-container-lowest border border-outline-variant p-space-md rounded">
+<!-- Metric 1 -->
+<div class="flex flex-col border-r border-outline-variant pr-space-md">
+<div class="flex items-baseline gap-space-2xs">
+<span id="m-plants" class="text-metric-display font-metric-display text-primary">{{ run_totals.plants if run_totals else '—' }}</span>
+<span class="text-metric-inline font-metric-inline text-on-surface-variant">PLANTS</span>
+</div>
+<span id="m-breakdown" class="text-label-instrument font-label-instrument text-on-surface-variant mt-space-2xs uppercase">
+          {% if run_totals %}{{ run_totals.crop }} CROP · {{ run_totals.weed }} WEED · {{ run_totals.unsure }} UNSURE{% else %}PLANTS FOUND ON TEST PHOTOS{% endif %}
+        </span>
+</div>
+<!-- Metric 2 -->
+<div class="flex flex-col border-r border-outline-variant pr-space-md pl-space-2xs">
+<div class="flex items-baseline gap-space-2xs">
+<span id="m-spray" class="text-metric-display font-metric-display text-[#D2452B]">{{ run_totals.spray if run_totals else '—' }}</span>
+<span class="text-metric-inline font-metric-inline text-on-surface-variant">SPRAY</span>
+</div>
+<span id="m-protect" class="text-label-instrument font-label-instrument text-on-surface-variant mt-space-2xs uppercase">
+          {% if run_totals %}{{ run_totals.protect }} PROTECTED{% else %}SPRAY DECISIONS (WEED ≥ 0.85){% endif %}
+        </span>
+</div>
+<!-- Metric 3 -->
+<div class="flex flex-col border-r border-outline-variant pr-space-md pl-space-2xs">
+<div class="flex items-baseline gap-space-2xs">
+<span id="m-seconds" class="text-metric-display font-metric-display text-primary">{{ run_totals.seconds if run_totals else '—' }}</span>
+<span class="text-metric-inline font-metric-inline text-on-surface-variant">SEC</span>
+</div>
+<span id="m-cost" class="text-label-instrument font-label-instrument text-on-surface-variant mt-space-2xs uppercase">
+          {% if run_totals %}COST ${{ run_totals.cost }}{% else %}TOTAL RUN TIME · ≈$0.01/PHOTO{% endif %}
+        </span>
+</div>
+<!-- Metric 4 -->
+<div class="flex flex-col pl-space-2xs">
+<div class="flex items-baseline gap-space-2xs">
+<span class="text-metric-display font-metric-display text-primary">{{ test_photos|length }}</span>
+<span class="text-metric-inline font-metric-inline text-on-surface-variant">FRAMES</span>
+</div>
+<span class="text-label-instrument font-label-instrument text-on-surface-variant mt-space-2xs uppercase">
+          TEST PHOTOS AUDITED
+        </span>
+</div>
+</section>
+<!-- INSTRUCTION STRIP (Industrial High-Contrast Alert Box) -->
+<div class="bg-surface-container border border-outline-variant px-space-md py-space-sm rounded flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[20px]" data-icon="psychiatry">psychiatry</span>
+<p class="text-body-default font-body-default text-on-surface">
+          {% if results %}The AI labeled these {{ test_photos|length }} test photos on its own without seeing answers. Review each overlay below — tap “Fix labels” on any wrong plant, then re-run: your fixes teach the next round. When it looks right, confirm to finalize.{% else %}Press “Run the test” below — the AI checks each test photo live (about 15–30 seconds per photo).{% endif %}
+        </p>
+</div>
+<div class="flex items-center gap-space-md">
+<!-- Legend Indicator -->
+<div class="flex items-center gap-space-sm text-label-instrument font-label-instrument text-on-surface-variant">
+<span class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 border border-[#2E9E5B] bg-[#2E9E5B]/20"></span>
+            {{ crop }}: protected
+          </span>
+<span class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 border border-[#D2452B] bg-[#D2452B]/20"></span>
+            Weed: sprayed
+          </span>
+</div>
+</div>
+</div>
+<!-- RUN CONTROL PANEL -->
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded p-space-md">
+{% if run_status == 'running' %}
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-body-strong font-body-strong text-primary">Evaluating test photos…</span>
+<span id="run-elapsed" class="font-metric-inline text-metric-inline text-on-surface-variant">0s</span>
+</div>
+<div id="run-stage" class="text-body-default font-body-default text-on-surface-variant mt-1">starting…</div>
+<div id="run-log" class="mt-2 p-2 bg-surface-container border border-[#DDE2DC] rounded font-mono text-[12px] text-on-surface max-h-40 overflow-y-auto whitespace-pre-wrap"></div>
+<p class="text-caption font-caption text-on-surface-variant mt-2">Keep this page open — it refreshes automatically when done.</p>
+{% elif run_status == 'done' %}
+<div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+<div>
+<div class="text-body-strong font-body-strong text-primary">✓ Round {{ run_round }}: {{ run_totals.plants }} plants in {{ run_totals.seconds }}s · ${{ run_totals.cost }}</div>
+{% if run_taught %}<div class="text-caption font-caption text-on-surface-variant">{{ run_taught }} — fix more below and re-run, or confirm when satisfied.</div>{% endif %}
+</div>
+</div>
+<form method="post" action="/field/{{ field }}/run" class="mt-space-sm flex flex-col gap-2">
+<div class="border border-outline-variant rounded p-2 flex flex-col gap-1" id="thr-box">
+<label for="spray-conf" class="text-label-instrument font-label-instrument text-on-surface-variant">SPRAY A WEED ONLY IF THE AI IS AT LEAST <b id="thr-val" class="text-primary">{{ '%.2f'|format(spray_conf) }}</b> SURE</label>
+<input id="spray-conf" name="spray_conf" type="range" min="0.5" max="0.99" step="0.01" value="{{ spray_conf }}" oninput="document.getElementById('thr-val').textContent=(+this.value).toFixed(2)" class="w-full accent-[#066c41]">
+<p class="text-caption font-caption text-on-surface-variant">Higher = safer: fewer weeds sprayed, fewer crops at risk. Lower = more weeds caught, more risk. Crops, mixed and unsure plants are always protected. Applies on the next re-run.</p>
+</div>
+<label for="run-note" class="text-label-instrument font-label-instrument text-on-surface-variant">NOTE FOR THE AI BEFORE RE-RUNNING (OPTIONAL)</label>
+<div class="flex flex-col sm:flex-row gap-2">
+<textarea id="run-note" name="note" rows="2" maxlength="1000" class="flex-1 border border-outline-variant rounded p-2 text-body-default font-body-default focus:border-secondary focus:ring-0" placeholder="e.g. The carrots here are the thin feathery ones; the broad round leaves are always weeds."></textarea>
+<button class="bg-[#18201B] text-white px-space-lg py-2.5 rounded text-label-instrument font-label-instrument hover:bg-primary transition-colors min-h-[48px] sm:self-end" type="submit">{% if corr_total %}Re-run with my fixes{% else %}Re-run the test{% endif %}</button>
+</div>
+{% if learned %}<p class="text-caption font-caption text-on-surface-variant">Your fixes and notes first rewrite the field checklist (the new one is used only if it scores at least as well on your labeled photos), then all {{ test_photos|length }} photos are judged again.</p>{% endif %}
+</form>
+{% if active %}
+<details data-key="checklist" class="mt-space-sm">
+<summary class="cursor-pointer text-caption font-caption text-on-surface-variant min-h-[32px] flex items-center">Field checklist in use: v{{ active.v }}</summary>
+<p class="mt-1 text-body-default font-body-default whitespace-pre-line border-l-2 border-secondary pl-2">{{ active.checklist }}</p>
+</details>
+{% endif %}
+{% if field_notes or photo_notes %}
+<details class="mt-space-sm">
+<summary class="cursor-pointer text-caption font-caption text-on-surface-variant min-h-[32px] flex items-center">Your notes the AI reads every run ({{ field_notes|length + photo_notes|length }})</summary>
+<ul class="mt-1 flex flex-col gap-1 text-caption font-caption text-on-surface">
+{% for n in field_notes %}<li class="border-l-2 border-secondary pl-2">Round {{ n.round }}: {{ n.text }}</li>{% endfor %}
+{% for name, pn in photo_notes.items() %}<li class="border-l-2 border-outline-variant pl-2">{{ name }}: {{ pn.text or '' }}{% if pn.plants %} <span class="text-on-surface-variant">({{ pn.plants|length }} plant note{{ 's' if pn.plants|length > 1 }})</span>{% endif %}</li>{% endfor %}
+</ul>
+</details>
+{% endif %}
+{% elif run_status == 'error' %}
+<div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+<div class="text-body-strong font-body-strong text-[#D2452B]">The run stopped with an error. Your labels are safe.</div>
+<form method="post" action="/field/{{ field }}/run"><button class="bg-[#18201B] text-white px-space-lg py-2.5 rounded text-label-instrument font-label-instrument hover:bg-primary transition-colors min-h-[48px]" type="submit">Try again</button></form>
+</div>
+{% else %}
+<div class="flex flex-col sm:flex-row sm:items-center gap-2 justify-between">
+<div>
+<div class="text-body-strong font-body-strong text-primary">{{ 'The AI is learning your field…' if learning else 'Teach the AI first' }}</div>
+<div class="text-caption font-caption text-on-surface-variant">On the Learning page the AI studies your labeled photos, writes a checklist, and tests it on these {{ test_photos|length }} photos. Its results then appear here for you to check.</div>
+</div>
+<a href="/field/{{ field }}/learning" class="bg-[#18201B] text-white px-space-lg py-2.5 rounded text-label-instrument font-label-instrument hover:bg-primary transition-colors min-h-[48px] flex items-center justify-center">Go to Learning</a>
+</div>
+{% endif %}
+</section>
+{% if learned and honest %}
+<!-- HONEST SCORE: the learning run vs your review, before your fixes taught it -->
+<section id="honest" class="bg-surface-container-lowest border border-[#DDE2DC] rounded p-space-md flex flex-col gap-space-sm">
+<div class="flex items-start justify-between gap-2 flex-wrap">
+<div>
+<h2 class="font-section-title text-section-title text-primary">Honest score <span class="font-caption text-caption text-on-surface-variant">(the AI's own labels, before your fixes)</span></h2>
+<p id="h-scored" class="text-caption font-caption text-on-surface-variant">Scored on {{ honest.scored_on }} of {{ honest.of }} photos. Check a photo, fix any wrong plants, then mark it Reviewed; only reviewed photos count.</p>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-space-sm">
+<div><div id="h-hits" class="font-metric-display-mobile text-metric-display-mobile {{ 'text-[#D2452B]' if honest.crop_hits else 'text-[#2E9E5B]' }}">{{ honest.crop_hits if honest.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">CROPS HIT</div></div>
+<div><div id="h-weeds" class="font-metric-display-mobile text-metric-display-mobile text-primary">{{ (honest.weeds_hit ~ '/' ~ honest.weeds) if honest.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">WEEDS CAUGHT</div></div>
+<div><div id="h-acc" class="font-metric-display-mobile text-metric-display-mobile text-primary">{{ (honest.accuracy_pct|round(0)|int ~ '%') if honest.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">LABELS RIGHT</div></div>
+</div>
+</section>
+{% endif %}
+<!-- MAIN INSPECTION GRID (3 Test Photos in Structured Columns) -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-space-md items-stretch flex-1">
+{% for t in test_photos %}
+{% set e = run_entries.get(t.name) %}
+<article class="bg-surface-container-lowest border border-outline-variant rounded flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between px-space-md py-space-xs border-b border-outline-variant">
+<div class="flex items-center gap-space-xs">
+<span class="text-label-instrument font-label-instrument text-primary font-bold">FRAME-{{ '%02d' % loop.index }}</span>
+<span class="text-caption font-metric-inline text-on-surface-variant">{{ t.name }}</span>
+</div>
+{% if e and e.status == 'done' %}
+<span id="chip-{{ t.name }}" class="bg-[#2E9E5B]/20 text-[#2E9E5B] border border-[#2E9E5B] px-space-2xs py-0.5 rounded text-[11px] font-label-instrument font-bold uppercase">Done · {{ e.plants }} plants</span>
+{% elif e and e.status == 'running' %}
+<span id="chip-{{ t.name }}" class="bg-[#E3A21A]/20 text-[#A26C00] border border-[#E3A21A] px-space-2xs py-0.5 rounded text-[11px] font-label-instrument font-bold uppercase animate-pulse">Running…</span>
+{% elif run_status == 'running' %}
+<span id="chip-{{ t.name }}" class="bg-surface-container text-on-surface-variant border border-outline-variant px-space-2xs py-0.5 rounded text-[11px] font-label-instrument font-bold uppercase">Queued</span>
+{% else %}
+<span class="bg-[#E3A21A]/20 text-[#A26C00] border border-[#E3A21A] px-space-2xs py-0.5 rounded text-[11px] font-label-instrument font-bold uppercase">Pending</span>
+{% endif %}
+</div>
+<div class="relative w-full aspect-[4/3] bg-[#E5E9E3] border-b border-outline-variant overflow-hidden group">
+{% if e and e.status == 'done' and card_boxes.get(t.name) and corr_counts.get(t.name) and run_status != 'running' %}
+<a href="/field/{{ field }}/fix/{{ t.name }}" class="block w-full h-full relative" title="Open to fix labels">
+<img id="img-{{ t.name }}" class="w-full h-full select-none pointer-events-none" data-alt="{{ t.name }}" src="/p/{{ field }}/{{ t.file }}" data-photo="/p/{{ field }}/{{ t.file }}" data-overlay="/run_overlay/{{ field }}/{{ t.name }}?r={{ run_round }}"/>
+<div class="cbox-layer">
+{% for b in card_boxes[t.name] %}<div class="cbox{% if b.changed %} changed{% endif %}" data-label="{{ b.label }}" style="left:{{ b.l }}%;top:{{ b.t }}%;width:{{ b.w }}%;height:{{ b.h }}%">{% if b.spray %}<i></i>{% endif %}</div>{% endfor %}
+</div>
+</a>
+<button type="button" class="ai-toggle absolute top-2 left-2 bg-primary-container/85 text-white font-label-instrument text-[11px] px-2 py-1 rounded min-h-[32px]" data-for="{{ t.name }}">AI view</button>
+{% elif e and e.overlay %}
+<img id="img-{{ t.name }}" class="w-full h-full object-cover select-none pointer-events-none" data-alt="{{ t.name }}" src="/run_overlay/{{ field }}/{{ t.name }}?r={{ run_round }}"/>
+{% else %}
+<img id="img-{{ t.name }}" class="w-full h-full object-cover select-none pointer-events-none" data-alt="{{ t.name }}" src="/p/{{ field }}/{{ t.file }}"/>
+{% endif %}
+<div class="absolute bottom-2 right-2 bg-primary-container/80 text-white font-metric-inline text-[11px] px-1.5 py-0.5 rounded">
+              {{ t.dims }}
+            </div>
+</div>
+<div id="body-{{ t.name }}" class="p-space-md flex flex-col gap-space-sm">
+{% if e and e.status == 'done' %}
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>
+<span class="text-body-strong font-body-strong text-primary">{{ e.crop }} crop · {{ e.weed }} weed · {{ e.unsure }} unsure</span>
+</div>
+<p class="text-caption font-caption text-on-surface-variant">{{ e.spray }} to spray · {{ e.protect }} protected · {{ e.seconds }}s · ${{ e.cost }}{% if corr_counts.get(t.name) %} · {{ corr_counts.get(t.name) }} fixed by you{% endif %}</p>
+{% elif e and e.status == 'running' %}
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-[#E3A21A] animate-pulse"></span>
+<span id="stage-{{ t.name }}" class="text-body-strong font-body-strong text-primary">{{ e.stage }}</span>
+</div>
+{% elif run_status == 'running' %}
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span id="stage-{{ t.name }}" class="text-body-strong font-body-strong text-primary">Waiting its turn</span>
+</div>
+{% else %}
+<div class="flex items-center gap-space-2xs">
+<span class="w-2 h-2 rounded-full bg-[#E3A21A]"></span>
+<span class="text-body-strong font-body-strong text-primary">Not evaluated yet</span>
+</div>
+<p class="text-caption font-caption text-on-surface-variant">
+              Press “Run the test” above to label this photo live.
+            </p>
+{% endif %}
+</div>
+</div>
+<div id="foot-{{ t.name }}" class="px-space-md py-space-sm border-t border-outline-variant bg-surface-container-lowest flex items-center justify-between">
+{% if e and e.status == 'done' %}
+{% if learned and run_status != 'running' %}
+<label class="inline-flex items-center gap-2 min-h-[48px] cursor-pointer select-none">
+<input type="checkbox" class="reviewed w-5 h-5 rounded border-outline-variant text-[#2E9E5B] focus:ring-0" data-name="{{ t.name }}" {{ 'checked' if reviewed.get(t.name) }}/>
+<span class="text-label-instrument font-label-instrument text-on-surface">Reviewed</span>
+</label>
+{% else %}
+<div class="inline-flex items-center gap-1.5 bg-surface-container border border-outline-variant px-space-xs py-1 rounded">
+<span class="material-symbols-outlined text-[16px] text-[#2E9E5B]" data-icon="check_circle">check_circle</span>
+<span class="text-label-instrument font-label-instrument text-on-surface">Evaluated in {{ e.seconds }}s</span>
+</div>
+{% endif %}
+<a class="inline-flex items-center min-h-[48px] px-space-xs text-label-instrument font-label-instrument text-primary underline hover:text-secondary" href="/field/{{ field }}/fix/{{ t.name }}">Fix labels</a>
+{% else %}
+<div class="inline-flex items-center gap-1.5 bg-surface-container border border-outline-variant px-space-xs py-1 rounded">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant" data-icon="hourglass_empty">hourglass_empty</span>
+<span class="text-label-instrument font-label-instrument text-on-surface">Not evaluated</span>
+</div>
+{% endif %}
+</div>
+</article>
+{% else %}
+<article class="bg-surface-container-lowest border border-outline-variant rounded p-space-md">
+<p class="text-body-default font-body-default text-on-surface-variant">No test photos yet — upload {{ P.photos }} photos first.</p>
+</article>
+{% endfor %}
+</section>
+<!-- BOTTOM ACTION PANEL (Physical Hardware Console Metaphor) -->
+<section class="bg-surface-container-lowest border border-outline-variant rounded p-space-md flex flex-col lg:flex-row gap-3 lg:items-center lg:justify-between">
+<!-- Operator Session Audit Trace -->
+<div class="flex items-center gap-space-md">
+<div class="w-8 h-8 rounded bg-surface-container flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[18px]" data-icon="verified_user">verified_user</span>
+</div>
+<div class="flex flex-col">
+{% if results %}
+<span class="text-body-strong font-body-strong text-primary">
+            {{ results.audit }}
+          </span>
+<span class="text-caption font-caption text-on-surface-variant">
+            Spray rule: only plants the AI calls weed at ≥ 85% confidence; crop, mixed and unsure plants are always protected. Check the overlays before confirming.
+          </span>
+{% else %}
+<span class="text-body-strong font-body-strong text-primary">
+            No run yet — press “Run the test” above.
+          </span>
+<span class="text-caption font-caption text-on-surface-variant">
+            The AI checks each test photo live, about 15–30 seconds each.
+          </span>
+{% endif %}
+</div>
+</div>
+<!-- Action Cluster -->
+<div class="flex items-center gap-space-sm">
+<a class="bg-surface-container-lowest text-primary border border-outline-variant px-space-md py-2.5 rounded text-label-instrument font-label-instrument hover:bg-surface-container transition-colors min-h-[48px] flex items-center" href="/field/{{ field }}/learning">
+          Back to Learning Log
+        </a>
+{% if results and results.get('confirmed') %}
+<a class="bg-[#18201B] text-white px-space-lg py-2.5 rounded text-label-instrument font-label-instrument hover:bg-primary transition-colors flex items-center gap-space-xs min-h-[48px]" href="/field/{{ field }}/ready">
+<span>View field summary</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</a>
+{% elif results %}
+<form method="post" action="/field/{{ field }}/confirm">
+<button class="bg-[#18201B] text-white px-space-lg py-2.5 rounded text-label-instrument font-label-instrument hover:bg-primary transition-colors flex items-center gap-space-xs min-h-[48px]" type="submit">
+<span>Confirm Results &amp; Finish</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</form>
+{% else %}
+<button disabled="" class="bg-[#D2DDD4] text-outline px-space-lg py-2.5 rounded text-label-instrument font-label-instrument flex items-center gap-space-xs min-h-[48px] cursor-not-allowed">
+<span>Confirm results</span>
+<span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+{% endif %}
+</div>
+</section>
+</main>
+<script>
+const RUNNING = {{ 'true' if run_status == 'running' else 'false' }};
+const FIELD = '{{ field }}';
+// Reviewed toggles: only reviewed photos count in the honest score.
+function paintHonest(h) {
+  if (!h || !document.getElementById('honest')) return;
+  const n = h.scored_on;
+  document.getElementById('h-scored').textContent =
+    'Scored on ' + n + ' of ' + h.of + ' photos. Check a photo, fix any wrong plants, then mark it Reviewed; only reviewed photos count.';
+  const hits = document.getElementById('h-hits');
+  hits.textContent = n ? h.crop_hits : '—';
+  hits.className = hits.className.replace(/text-\[#[0-9A-F]{6}\]/, h.crop_hits ? 'text-[#D2452B]' : 'text-[#2E9E5B]');
+  document.getElementById('h-weeds').textContent = n ? (h.weeds_hit + '/' + h.weeds) : '—';
+  document.getElementById('h-acc').textContent = n ? (Math.round(h.accuracy_pct) + '%') : '—';
+}
+document.querySelectorAll('input.reviewed').forEach(box => box.addEventListener('change', async () => {
+  box.disabled = true;
+  try {
+    const r = await fetch('/field/' + FIELD + '/reviewed/' + encodeURIComponent(box.dataset.name), {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({reviewed: box.checked})});
+    const j = await r.json();
+    box.checked = j.reviewed;
+    paintHonest(j.honest);
+  } catch (e) { box.checked = !box.checked; }
+  box.disabled = false;
+}));
+document.querySelectorAll('.ai-toggle').forEach(b => b.addEventListener('click', () => {
+  const img = document.getElementById('img-' + b.dataset.for);
+  const layer = img.parentElement.querySelector('.cbox-layer');
+  const toAi = !layer.classList.contains('hide');
+  img.src = toAi ? img.dataset.overlay : img.dataset.photo;
+  layer.classList.toggle('hide', toAi);
+  b.textContent = toAi ? 'Your labels' : 'AI view';
+}));
+if (!RUNNING) {
+  // Idle: pick up a run started from another device (e.g. the phone).
+  setInterval(async () => {
+    try {
+      const j = await (await fetch('/api/run/' + FIELD)).json();
+      if (j.status === 'running') location.reload();
+    } catch (err) { /* offline: try again next tick */ }
+  }, 4000);
+}
+if (RUNNING) {
+  let t0 = Date.now();
+  setInterval(() => {
+    const el = document.getElementById('run-elapsed');
+    if (el) el.textContent = Math.round((Date.now() - t0) / 1000) + 's';
+  }, 1000);
+  const $ = id => document.getElementById(id);
+  const elapsed = $('run-elapsed'), stage = $('run-stage'), log = $('run-log');
+  const mPlants = $('m-plants'), mBreak = $('m-breakdown'),
+        mSpray = $('m-spray'), mProt = $('m-protect'),
+        mSecs = $('m-seconds'), mCost = $('m-cost');
+  const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  async function poll() {
+    try {
+      const r = await fetch('/api/run/' + FIELD);
+      const j = await r.json();
+      if (typeof j.elapsed === 'number') t0 = Date.now() - j.elapsed * 1000;
+      const secs = Math.round((Date.now() - t0) / 1000);
+      if (elapsed) elapsed.textContent = secs + 's';
+      if (j.status !== 'running') { location.reload(); return; }
+      const es = j.entries || [];
+      const done = es.filter(e => e.status === 'done');
+      const sum = k => done.reduce((a, e) => a + (e[k] || 0), 0);
+      if (mPlants) mPlants.textContent = sum('plants');
+      if (mBreak) mBreak.textContent =
+        sum('crop') + ' CROP · ' + sum('weed') + ' WEED · ' + sum('unsure') + ' UNSURE';
+      if (mSpray) mSpray.textContent = sum('spray');
+      if (mProt) mProt.textContent = sum('protect') + ' PROTECTED';
+      if (mSecs) mSecs.textContent = secs;
+      if (mCost) mCost.textContent =
+        'COST $' + done.reduce((a, e) => a + (e.cost || 0), 0).toFixed(4);
+      const cur = es.find(e => e.status === 'running');
+      if (stage) stage.textContent = cur ? (cur.name + ': ' + cur.stage) : 'finishing…';
+      if (log) {
+        log.textContent = (j.log || []).join('\n');
+        log.scrollTop = log.scrollHeight;
+      }
+      es.forEach(e => {
+        const chip = $('chip-' + e.name);
+        if (chip) {
+          const CHIP = 'px-space-2xs py-0.5 rounded text-[11px] font-label-instrument font-bold uppercase border ';
+          if (e.status === 'done') {
+            chip.textContent = 'Done · ' + e.plants + ' plants';
+            chip.className = CHIP + 'bg-[#2E9E5B]/20 text-[#2E9E5B] border-[#2E9E5B]';
+          } else if (e.status === 'running') {
+            chip.textContent = 'Running…';
+            chip.className = CHIP + 'bg-[#E3A21A]/20 text-[#A26C00] border-[#E3A21A] animate-pulse';
+          }
+        }
+        const st = $('stage-' + e.name);
+        if (st && e.status === 'running') {
+          st.textContent = e.stage;
+          const dot = st.previousElementSibling;
+          if (dot) dot.className = 'w-2 h-2 rounded-full bg-[#E3A21A] animate-pulse';
+        }
+        if (e.status === 'done') {
+          const img = $('img-' + e.name);
+          if (img && !img.dataset.live) {
+            img.dataset.live = '1';
+            // Keep the plain photo, faded, until the detection image arrives.
+            img.style.transition = 'opacity .2s';
+            img.style.opacity = '0.45';
+            const next = new Image();
+            next.onload = () => { img.src = next.src; img.style.opacity = '1'; };
+            next.onerror = () => { img.style.opacity = '1'; delete img.dataset.live; };
+            next.src = '/run_overlay/' + FIELD + '/' + e.name + '?t=' + Date.now();
+          }
+          const body = $('body-' + e.name);
+          if (body && !body.dataset.live) {
+            body.dataset.live = '1';
+            body.innerHTML =
+              '<div class="flex items-center gap-space-2xs">' +
+              '<span class="w-2 h-2 rounded-full bg-[#2E9E5B]"></span>' +
+              '<span class="text-body-strong font-body-strong text-primary">' +
+              e.crop + ' crop · ' + e.weed + ' weed · ' + e.unsure + ' unsure</span></div>' +
+              '<p class="text-caption font-caption text-on-surface-variant">' +
+              e.spray + ' to spray · ' + e.protect + ' protected · ' +
+              e.seconds + 's · $' + e.cost + '</p>';
+          }
+          const foot = $('foot-' + e.name);
+          if (foot && !foot.dataset.live) {
+            foot.dataset.live = '1';
+            foot.innerHTML =
+              '<div class="inline-flex items-center gap-1.5 bg-surface-container border border-outline-variant px-space-xs py-1 rounded">' +
+              '<span class="material-symbols-outlined text-[16px] text-[#2E9E5B]" data-icon="check_circle">check_circle</span>' +
+              '<span class="text-label-instrument font-label-instrument text-on-surface">Evaluated in ' +
+              e.seconds + 's</span></div>' +
+              '<a class="inline-flex items-center min-h-[48px] px-space-xs text-label-instrument font-label-instrument text-primary underline hover:text-secondary" href="/field/' +
+              esc(FIELD) + '/fix/' + esc(e.name) + '">Fix labels</a>';
+          }
+        }
+      });
+    } catch (err) {
+      if (stage) stage.textContent = 'connection lost — retrying…';
+    }
+    setTimeout(poll, 2000);
+  }
+  poll();
+}
+</script>
+</body></html>

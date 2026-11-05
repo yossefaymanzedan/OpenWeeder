@@ -1,0 +1,235 @@
+{% set title = 'OpenWeeder — Train model' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+{% if crop %}<a href="/train" class="hover:text-primary">Train model</a><span class="text-outline-variant">/</span><span class="text-primary font-body-strong">{{ crop }}</span>{% else %}<span class="text-primary font-body-strong">Train model</span>{% endif %}
+</nav></div></header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+{% set CARD = 'bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg' %}
+{% set BTN = 'bg-primary-container text-on-primary hover:bg-black px-space-lg py-2.5 rounded-lg text-body-strong font-body-strong min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed' %}
+{% if not crop %}
+<section class="{{ CARD }}">
+<h1 class="font-page-title text-page-title text-primary tracking-tight">Train model</h1>
+<p class="text-body-default text-on-surface-variant mt-1">Teach a small offline detector (YOLO) for a crop. Pick a crop that has finished its steps.</p>
+</section>
+<section class="{{ CARD }} flex flex-col gap-space-sm">
+{% for c in crops %}
+{% if c.ready %}
+<a href="/train/{{ c.name }}" data-crop="{{ c.name }}" class="border border-outline-variant rounded-lg p-space-md hover:border-secondary flex items-center justify-between"><div><div class="text-body-strong font-body-strong text-primary">{{ c.name }}</div><div class="text-caption text-on-surface-variant">{{ c.crop }}</div></div><span class="material-symbols-outlined">arrow_forward</span></a>
+{% else %}
+<div class="border border-dashed border-outline-variant rounded-lg p-space-md opacity-50"><div class="text-body-strong font-body-strong">{{ c.name }}</div><div class="text-caption">Not finished: complete its steps first.</div></div>
+{% endif %}
+{% else %}<p class="text-on-surface-variant">No crops yet. <a class="underline" href="/crop/new">Create one</a>.</p>{% endfor %}
+</section>
+{% else %}
+<section class="{{ CARD }}">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">TRAIN MODEL</span>
+<h1 class="font-page-title text-page-title text-primary tracking-tight">{{ crop }}</h1>
+<p class="text-body-default text-on-surface-variant mt-1">Dataset &rarr; auto label &rarr; train. <span id="summary"></span></p>
+</section>
+
+<section class="{{ CARD }}" id="step-data">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">1. Dataset</h2>
+<p class="text-caption text-on-surface-variant mb-space-sm">The robot drives the column at {{ recording.speed_cm_s }} cm/s and saves {{ fps }} photos every second from the phone camera, straight into this dataset{% if recording.crop_to_tray %}, each one cut to the tray (straight and centred), the same view the detectors get in the field; the full photos are kept in train/raw{% endif %}. It stops by itself after {{ recording.max_cm }} cm, or if the wheels stop turning.</p>
+<div id="cam-connect" class="flex flex-wrap items-center gap-space-md border border-outline-variant rounded-lg p-space-md mb-space-md">
+<img id="cam-qr" src="/camera/qr.svg" alt="QR code of the robot camera link" class="w-40 h-40 bg-white rounded" style="display:none">
+<div class="flex-1 min-w-[220px]">
+<div class="font-label-instrument text-label-instrument text-on-surface-variant">OPEN ON THE PHONE ON THE ROBOT</div>
+<div id="cam-link" class="text-section-title font-section-title text-primary break-all mt-1"></div>
+<p class="text-caption text-on-surface-variant mt-1">Scan the code with the phone's camera, or type the link. Accept the security warning, allow the camera, and keep that page open.</p>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-space-md items-start">
+<div>
+<div class="bg-black rounded-lg overflow-hidden flex items-center justify-center min-h-[200px]">
+<img id="cam-preview" alt="What the robot camera sees, with the tray cut out" class="w-full object-contain" style="display:none">
+<span id="cam-empty" class="text-caption text-white/70 p-space-md">No camera connected</span>
+</div>
+<p id="tray-info" class="text-caption text-on-surface-variant mt-1"></p>
+</div>
+<div class="flex flex-col gap-2">
+<div><span class="font-label-instrument text-label-instrument text-on-surface-variant">ROBOT CAMERA</span> <span id="cam-status" class="text-caption"></span></div>
+<div class="flex flex-wrap gap-2 items-center mt-1">
+<button id="rec-start" class="{{ BTN }}">Start robot</button>
+<button id="rec-stop" class="{{ BTN }}" disabled>Stop</button>
+</div>
+<span id="rec-msg" class="text-body-default text-on-surface-variant"></span>
+</div>
+</div>
+<form id="import-form" class="mt-space-md flex flex-col gap-2 border-t border-[#DDE2DC] pt-space-md">
+<label class="text-label-instrument font-label-instrument text-on-surface-variant" for="imp-files">IMPORT IMAGES</label>
+<input id="imp-files" name="images" type="file" accept="image/*" multiple class="text-body-default">
+<label class="text-label-instrument font-label-instrument text-on-surface-variant" for="imp-folder">OR A FOLDER ON THIS COMPUTER</label>
+<input id="imp-folder" name="folder" type="text" placeholder="e.g. data/synthetic/molokhia_100" class="border border-outline-variant rounded-lg px-space-sm py-2">
+<div><button type="submit" id="imp-btn" class="{{ BTN }}">Add to dataset</button> <span id="imp-msg" class="text-caption text-on-surface-variant"></span></div>
+</form>
+{% if rec_videos %}
+<div class="mt-space-md">
+<div class="font-label-instrument text-label-instrument text-on-surface-variant mb-1">RECORDING VIDEOS (REAL TIME)</div>
+<div class="flex flex-col gap-2">
+{% for v in rec_videos %}<div class="text-caption">{{ v }}<video controls preload="none" class="w-full rounded mt-1" src="/train_video/{{ crop }}/{{ v }}"></video></div>{% endfor %}
+</div>
+</div>
+{% endif %}
+<div id="thumbs" class="grid grid-cols-6 gap-1 mt-space-md">
+{% for t in thumbs %}<img src="/train_img/{{ crop }}/{{ t }}" loading="lazy" class="w-full aspect-[3/4] object-cover rounded">{% endfor %}
+</div>
+</section>
+
+<section class="{{ CARD }}" id="step-label">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">2. Auto label</h2>
+<p class="text-caption text-on-surface-variant mb-space-sm">SAM finds every plant and Muse Spark calls it crop or weed using what this crop learned in its steps. Only confident calls become labels; unsure plants are left out. It uses the AI service and costs about $0.02 per image.</p>
+<div class="flex flex-wrap gap-2 items-center">
+<button id="label-btn" class="{{ BTN }}">Auto label</button>
+<button id="label-stop" class="{{ BTN }}" style="display:none">Stop</button>
+<span id="label-msg" class="text-caption text-on-surface-variant"></span>
+</div>
+<div class="h-2 bg-surface-container rounded mt-2"><div id="label-bar" class="h-2 bg-secondary rounded" style="width:0"></div></div>
+</section>
+
+<section class="{{ CARD }}" id="step-fit">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">3. Train YOLO</h2>
+<p class="text-caption text-on-surface-variant mb-space-sm">Small YOLO (yolo11n), at most {{ max_epochs }} epochs, on this computer. Numbers update after every epoch. They are measured on 20% of the AI-labeled images, so they show agreement with the AI's labels, not with a person.</p>
+<div class="flex flex-wrap gap-2 items-center">
+<label class="text-label-instrument font-label-instrument text-on-surface-variant" for="epochs">EPOCHS</label>
+<input id="epochs" type="number" min="1" max="{{ max_epochs }}" value="{{ max_epochs }}" class="w-20 border border-outline-variant rounded-lg px-2 py-2">
+<button id="fit-btn" class="{{ BTN }}">Train</button>
+<button id="fit-stop" class="{{ BTN }}" style="display:none">Stop after this epoch</button>
+<span id="fit-msg" class="text-caption text-on-surface-variant"></span>
+</div>
+<div class="h-2 bg-surface-container rounded mt-2"><div id="fit-bar" class="h-2 bg-secondary rounded" style="width:0"></div></div>
+<div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-space-md" id="fit-cards">
+{% for k,l in (('map50','mAP50'),('map50_95','mAP50-95'),('precision','PRECISION'),('recall','RECALL')) %}
+<div class="border border-[#DDE2DC] rounded-lg p-space-sm"><div class="font-label-instrument text-label-instrument text-on-surface-variant">{{ l }}</div><div id="m-{{ k }}" class="font-metric-display-mobile text-metric-display-mobile text-primary">&mdash;</div></div>
+{% endfor %}
+</div>
+<canvas id="chart" width="880" height="220" class="w-full mt-space-md border border-[#DDE2DC] rounded-lg"></canvas>
+<p class="text-caption text-on-surface-variant">green = mAP50, orange = box loss (scaled), per epoch</p>
+<div class="overflow-x-auto mt-2"><table class="w-full text-caption font-mono"><thead><tr class="text-left text-on-surface-variant"><th>epoch</th><th>box loss</th><th>cls loss</th><th>precision</th><th>recall</th><th>mAP50</th><th>mAP50-95</th></tr></thead><tbody id="fit-rows"></tbody></table></div>
+<p id="saved" class="text-body-default text-secondary mt-2"></p>
+</section>
+
+<section class="{{ CARD }}" id="results" style="display:none">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">Test-set results</h2>
+<p class="text-caption text-on-surface-variant mb-space-sm" id="split-note"></p>
+<div id="spray-box" class="mb-space-md" style="display:none">
+<p class="text-caption text-on-surface-variant mb-1" id="op-note"></p>
+<div class="overflow-x-auto"><table class="w-full text-caption font-mono"><thead><tr class="text-left text-on-surface-variant"><th>checked on</th><th>large weeds found</th><th>all weeds found</th><th>crop hits</th><th>unsure hits</th><th>sprays on nothing</th><th>sprays</th></tr></thead><tbody id="op-rows"></tbody></table></div>
+</div>
+<div class="overflow-x-auto"><table class="w-full text-caption font-mono"><thead><tr class="text-left text-on-surface-variant"><th>class</th><th>precision</th><th>recall</th><th>mAP50</th><th>mAP50-95</th></tr></thead><tbody id="pc-rows"></tbody></table></div>
+<h3 class="text-body-strong font-body-strong text-primary mt-space-md mb-1">Examples from the test set</h3>
+<p class="text-caption text-on-surface-variant mb-space-sm">Left: the AI's labels the model is scored against. Right: what YOLO predicts. green = crop, red = weed. These images were never used for training.</p>
+<div id="examples" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+</section>
+
+<script>
+const CROP = {{ crop|tojson }};
+const $ = id => document.getElementById(id);
+const post = (u, body) => fetch(u, {method: 'POST', body}).then(r => r.json());
+function draw(rows) {
+  const c = $('chart'), g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height);
+  g.strokeStyle = '#DDE2DC'; g.strokeRect(30, 10, c.width - 40, c.height - 30);
+  if (!rows.length) return;
+  const n = Math.max(rows.length, 2), mx = Math.max(...rows.map(r => r.box_loss || 0), 0.001);
+  const line = (f, col) => { g.beginPath(); g.strokeStyle = col; g.lineWidth = 2;
+    rows.forEach((r, i) => { const x = 30 + (c.width - 40) * i / (n - 1), y = 10 + (c.height - 30) * (1 - f(r));
+      i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); };
+  line(r => r.map50, '#066c41'); line(r => (r.box_loss || 0) / mx, '#E3A21A');
+}
+function render(s) {
+  const i = s.info;
+  $('summary').textContent = `${i.images} images, ${i.labeled} labeled` + (i.model ? ', model saved' : '');
+  $('label-btn').disabled = s.label.status === 'running' || s.fit.status === 'running' || !i.images;
+  $('label-stop').style.display = s.label.status === 'running' ? '' : 'none';
+  const L = s.label; $('label-bar').style.width = L.total ? (100 * L.done / L.total) + '%' : '0';
+  $('label-msg').textContent = L.status === 'idle' ? (i.images - i.labeled ? `${i.images - i.labeled} images to label, about $${i.est_usd}` : (i.images ? 'All images are labeled.' : ''))
+    : `${L.status}: ${L.done}/${L.total}, $${L.usd}` + (L.status === 'error' ? ' — ' + L.msg : '');
+  const F = s.fit, rows = F.rows || [];
+  $('fit-btn').disabled = F.status === 'running' || L.status === 'running' || i.labeled < 4;
+  $('fit-stop').style.display = F.status === 'running' ? '' : 'none';
+  $('fit-bar').style.width = F.epochs ? (100 * rows.length / F.epochs) + '%' : '0';
+  $('fit-msg').textContent = F.status === 'idle' ? (i.labeled < 4 ? 'Needs at least 4 labeled images.' : '')
+    : F.status === 'running' ? `epoch ${rows.length}/${F.epochs} — ${rows.length ? '' : F.msg}` : F.msg;
+  const last = rows[rows.length - 1] || (i.metrics && i.metrics.best) || null;
+  for (const k of ['map50', 'map50_95', 'precision', 'recall']) $('m-' + k).textContent = last ? last[k].toFixed(3) : '—';
+  const shown = rows.length ? rows : ((i.metrics && i.metrics.rows) || []);
+  $('fit-rows').innerHTML = shown.map(r => `<tr><td>${r.epoch}</td><td>${r.box_loss}</td><td>${r.cls_loss}</td><td>${r.precision}</td><td>${r.recall}</td><td>${r.map50}</td><td>${r.map50_95}</td></tr>`).join('');
+  draw(shown);
+  $('saved').textContent = i.model ? `Model saved: fields/${CROP}/yolo/best.pt` + (i.metrics ? ` (${i.metrics.saved_at})` : '') : '';
+  const M = i.metrics;
+  $('results').style.display = M && M.per_class ? '' : 'none';
+  if (M && M.per_class) {
+    $('split-note').textContent = `Trained on ${M.n_train} images, ${M.n_calib} for calibration, tested on ${M.n_test} images the model never saw. ${M.note}`;
+    const OP = M.operating_point;
+    $('spray-box').style.display = OP ? '' : 'none';
+    if (OP) {
+      $('op-note').textContent = `Spray settings chosen on the ${M.n_calib} calibration images: weed confidence >= ${OP.conf_w}, veto margin ${OP.margin}, crop/unsure confidence >= ${OP.crop_conf}. A spray is vetoed when it falls inside a detected crop or unsure plant. Large weed = box at least 3% of the image's long side.`;
+      const row = (name, r) => r ? `<tr><td>${name}</td><td>${r.large_found}/${r.large_total} (${r.large_found_pct ?? '-'}%)</td><td>${r.weeds_found}/${r.weeds_total} (${r.weeds_found_pct ?? '-'}%)</td><td style="color:${r.crop_hits ? '#D2452B' : '#2E9E5B'}">${r.crop_hits}</td><td style="color:${r.unsure_hits ? '#D2452B' : '#2E9E5B'}">${r.unsure_hits}</td><td>${r.false_sprays}</td><td>${r.sprays}</td></tr>` : '';
+      $('op-rows').innerHTML = row(`calibration (${M.n_calib} img, used to choose)`, OP.calibration) + row(`test (${M.n_test} img, never used)`, OP.test) + row(`your real photos (${OP.real_photos ? OP.real_photos.n : 0})`, OP.real_photos);
+    }
+    $('pc-rows').innerHTML = M.per_class.map(r => `<tr><td>${r.class}</td><td>${r.precision}</td><td>${r.recall}</td><td>${r.map50}</td><td>${r.map50_95}</td></tr>`).join('');
+    if (!$('examples').dataset.n || $('examples').dataset.n != M.saved_at) {
+      $('examples').dataset.n = M.saved_at;
+      $('examples').innerHTML = (M.examples || []).map(f => `<img src="/train_example/${CROP}/${f}?v=${encodeURIComponent(M.saved_at)}" loading="lazy" class="w-full rounded border border-[#DDE2DC]">`).join('');
+    }
+  }
+  const C = s.collect;
+  if (C.msg) $('rec-msg').textContent = C.msg;
+  $('rec-start').disabled = !!C.on;
+  $('rec-stop').disabled = !C.on;
+  if (wasRecording && !C.on && C.saved) location.reload();  // show the new photos
+  wasRecording = !!C.on;
+}
+let wasRecording = false;
+async function poll() { try { render(await (await fetch('/api/train/' + CROP)).json()); } catch (e) {} }
+const RECORDING = {{ recording|tojson }};
+$('rec-start').onclick = async () => {
+  if (!confirm(`The robot will drive forward up to ${RECORDING.max_cm} cm at ${RECORDING.speed_cm_s} cm/s. Is the path clear?`)) return;
+  const r = await post(`/api/train/${CROP}/collect/start`); $('rec-msg').textContent = r.msg; poll(); };
+$('rec-stop').onclick = async () => { const r = await post(`/api/train/${CROP}/collect/stop`); $('rec-msg').textContent = r.msg; };
+async function pollCamera() {
+  let c = {};
+  try { c = await (await fetch('/api/camera')).json(); } catch (e) { return; }
+  const parts = c.connected ? ['connected'] : ['not connected'];
+  if (c.connected && c.width) parts.push(`${c.width}×${c.height}`);
+  if (c.connected && c.zoom) parts.push(`zoom ${Number(c.zoom).toFixed(1)}× ${c.zoom_kind || ''}`);
+  $('cam-status').textContent = parts.join(', ');
+  $('cam-status').style.color = c.connected ? '#2E9E5B' : '#D2452B';
+  $('cam-link').innerHTML = c.links && c.links.length
+    ? c.links.map(l => `<a class="underline" href="${l}" target="_blank" rel="noopener">${l}</a>`).join('<br>')
+    : (c.error || '');
+  $('cam-qr').style.display = c.links && c.links.length ? '' : 'none';
+  if (c.connected) {
+    $('cam-preview').src = '/camera/tray.jpg?t=' + Date.now();
+    try {
+      const t = await (await fetch('/api/camera/tray')).json();
+      $('tray-info').textContent = !t.found ? 'No tray found in the picture: photos are saved whole.'
+        : `Tray: ${Math.abs(t.offset_pct) < 2 ? 'centred' : Math.abs(t.offset_pct) + '% ' + (t.offset_pct < 0 ? 'left' : 'right') + ' of centre'}, tilted ${t.tilt_deg} degrees, ${t.width_pct}% of the width. Right: what each saved photo will be.`;
+    } catch (e) { /* keep the last text */ }
+  } else { $('cam-preview').style.display = 'none'; $('cam-empty').style.display = ''; $('tray-info').textContent = ''; }
+}
+$('cam-preview').onload = () => { $('cam-preview').style.display = ''; $('cam-empty').style.display = 'none'; };
+$('cam-preview').onerror = () => { $('cam-preview').style.display = 'none'; $('cam-empty').style.display = ''; };
+pollCamera(); setInterval(pollCamera, 1000);
+$('import-form').onsubmit = async e => { e.preventDefault(); $('imp-msg').textContent = 'Adding...';
+  const r = await post(`/api/train/${CROP}/import`, new FormData(e.target));
+  if (r.error) { $('imp-msg').textContent = r.error; return; }
+  $('imp-msg').textContent = `Added ${r.added} images.`; location.reload(); };
+$('label-btn').onclick = async () => {
+  if (!confirm('Auto label uses the AI service and costs money (about $0.02 per image). Go ahead?')) return;
+  const r = await post(`/api/train/${CROP}/label`); if (r.error) alert(r.error); poll(); };
+$('label-stop').onclick = () => post(`/api/train/${CROP}/stop/label`);
+$('fit-btn').onclick = async () => { const f = new FormData(); f.append('epochs', $('epochs').value);
+  const r = await post(`/api/train/${CROP}/fit`, f); if (r.error) alert(r.error); poll(); };
+$('fit-stop').onclick = () => post(`/api/train/${CROP}/stop/fit`);
+poll(); setInterval(poll, 2000);
+</script>
+{% endif %}
+</main>
+</body></html>

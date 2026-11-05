@@ -1,0 +1,57 @@
+{% set title = 'OpenWeeder — Train new crop' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+<span class="text-primary font-body-strong">Train new crop</span>
+</nav>
+</div>
+</header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg" id="train-dummy">
+<div class="flex items-center gap-space-xs mb-space-2xs">
+<span class="inline-block w-2.5 h-2.5 bg-[#E3A21A] rounded-sm"></span>
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">NOT BUILT YET &middot; PLACEHOLDER PAGE</span>
+</div>
+<h1 class="font-page-title text-page-title text-primary tracking-tight">Train a new crop with the robot</h1>
+<p class="text-body-default text-on-surface-variant mt-1">This is how a crop will be taught once the robot exists. Nothing on this page runs yet. For now, teach a crop with tray photos from <a class="underline" href="/crop/new">New crop</a>.</p>
+</section>
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<h2 class="text-section-title font-section-title text-primary mb-space-sm">What will happen</h2>
+<ol class="flex flex-col gap-space-md">
+<li class="flex gap-space-sm"><span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument">1</span><div><div class="text-body-strong font-body-strong text-primary">Drive three columns</div><p class="text-caption text-on-surface-variant">The robot drives down three columns of this crop once each, taking a photo every few centimeters. Nothing is sprayed.</p></div></li>
+<li class="flex gap-space-sm"><span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument">2</span><div><div class="text-body-strong font-body-strong text-primary">The AI labels, you review</div><p class="text-caption text-on-surface-variant">SAM and Muse Spark label every plant as crop or weed. You fix the mistakes.</p></div></li>
+<li class="flex gap-space-sm"><span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument">3</span><div><div class="text-body-strong font-body-strong text-primary">Train the offline model</div><p class="text-caption text-on-surface-variant">A small detector learns your reviewed labels on a computer, without the internet.</p></div></li>
+<li class="flex gap-space-sm"><span class="w-6 h-6 shrink-0 rounded-lg border border-outline-variant bg-surface-container flex items-center justify-center text-label-instrument">4</span><div><div class="text-body-strong font-body-strong text-primary">Use it in a field</div><p class="text-caption text-on-surface-variant">Pick the trained crop in <a class="underline" href="/fields/new">New field</a>. The robot then detects and sprays in one pass.</p></div></li>
+</ol>
+</section>
+{% set have = crops|selectattr('images')|list %}
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg" id="existing">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">Continue a dataset you already have</h2>
+<p class="text-caption text-on-surface-variant mb-space-sm">Collected images, labels and trained models are kept for each crop. Open one to keep going: add images, label only the ones not labeled yet, or train.</p>
+{% for c in have %}
+<div class="flex items-center justify-between gap-2 border border-outline-variant rounded-lg p-space-md mb-2" data-existing="{{ c.name }}">
+<div><div class="text-body-strong font-body-strong text-primary">{{ c.name }}</div>
+<div class="text-caption text-on-surface-variant">{{ c.images }} images, {{ c.labeled }} labeled{% if c.model %}, model trained{% endif %}</div></div>
+{% if c.ready %}<a href="/train/{{ c.name }}" class="bg-primary-container text-on-primary px-space-md py-2 rounded-lg text-body-strong">Continue</a>
+{% else %}<span class="text-caption text-on-surface-variant">finish this crop's steps first</span>{% endif %}
+</div>
+{% else %}<p class="text-caption text-on-surface-variant" id="no-existing">No dataset collected yet.</p>{% endfor %}
+</section>
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<h2 class="text-section-title font-section-title text-primary mb-space-sm">Start (disabled)</h2>
+<label class="text-label-instrument font-label-instrument text-primary" for="train-crop">CROP</label>
+<select id="train-crop" disabled class="w-full mt-1 mb-space-md bg-surface-container border border-outline-variant rounded-lg px-space-sm py-2">
+{% for f in crops %}<option>{{ f.name }} ({{ f.crop }})</option>{% else %}<option>No crops yet</option>{% endfor %}
+</select>
+<button type="button" id="train-start" disabled aria-disabled="true" class="bg-primary-container text-on-primary hover:bg-black px-space-xl py-3 rounded-lg text-body-strong font-body-strong flex items-center gap-space-xs min-h-[52px] opacity-40 cursor-not-allowed">Start driving three columns<span class="material-symbols-outlined">arrow_forward</span></button>
+<p class="text-caption text-on-surface-variant mt-space-xs">Disabled: the robot is not built and this step is not implemented.</p>
+</section>
+</main>
+</body></html>

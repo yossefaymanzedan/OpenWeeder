@@ -1,0 +1,24 @@
+{
+  "placeholder": true,
+  "note": "PLACEHOLDER values until the robot is built. Replace each with a real measurement, add its name to \"measured\", and set placeholder to false when all are measured. See PROJECT.md, Geometry and calibration.",
+  "measured": {
+    "camera_to_nozzle_cm": true,
+    "arm_length_cm": true,
+    "camera_height_cm": true,
+    "camera_hfov_deg": true,
+    "ridge_height_cm": true
+  },
+  "camera_height_cm": 29.0,
+  "ridge_height_cm": 0.0,
+  "camera_to_nozzle_cm": 16.5,
+  "camera_side_offset_cm": 0,
+  "nozzle_height_cm": 15,
+  "cm_per_tick": 1.0,
+  "camera_hfov_deg": 20.83,
+  "image_width_px": 1296,
+  "image_height_px": 972,
+  "arm_length_cm": 8.0,
+  "spray_radius_cm": 0.75,
+  "protect_margin_cm": 0.25,
+  "pump_flow_ml_per_s": 2
+}

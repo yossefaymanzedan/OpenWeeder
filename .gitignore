@@ -1,0 +1,18 @@
+# secrets
+.env
+.certs/
+# environments
+.venv*/
+__pycache__/
+*.pyc
+.pytest_cache/
+# data (large, private)
+fields/
+out/
+data/
+recordings/
+farm/
+dist/
+*.pt
+*.mp4
+*.mkv

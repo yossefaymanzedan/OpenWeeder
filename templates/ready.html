@@ -1,0 +1,94 @@
+{% set title = 'OpenWeeder — Field Ready' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+<a href="/#crops" class="hover:text-primary">Crops</a>
+<span class="text-outline-variant">/</span>
+<a href="/field/{{ field }}" class="hover:text-primary">{{ field }}</a>
+<span class="text-outline-variant">/</span>
+<span class="text-primary font-body-strong">Field summary</span>
+</nav>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant rounded px-space-xs py-space-2xs flex items-center gap-space-2xs">
+{% if ready %}<span class="w-1.5 h-1.5 rounded-full bg-[#2E9E5B]"></span>{% else %}<span class="w-1.5 h-1.5 rounded-full bg-[#E3A21A]"></span>{% endif %}
+<span class="text-label-instrument font-label-instrument text-on-surface tracking-wider">{% if ready %}FIELD READY{% else %}NOT READY YET{% endif %}</span>
+</div>
+</header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+<section class="bg-surface-container-lowest border {% if ready %}border-2 border-secondary{% else %}border-[#DDE2DC]{% endif %} rounded-xl p-space-lg">
+<div class="flex items-center gap-space-xs mb-space-2xs">
+<span class="inline-block w-2.5 h-2.5 {% if ready %}bg-secondary{% else %}bg-[#E3A21A]{% endif %} rounded-sm"></span>
+<span class="font-label-instrument text-label-instrument uppercase {% if ready %}text-secondary{% else %}text-on-surface-variant{% endif %}">FIELD SUMMARY</span>
+</div>
+<h1 class="font-page-title text-page-title text-primary tracking-tight">{{ field }}</h1>
+<p class="font-body-default text-body-default text-on-surface-variant mt-1">{{ crop }} · {{ labeled|length }} photos labeled · {{ test_photos|length }} test photos · {{ changed_total }} farmer fixes</p>
+{% if ready %}
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-space-sm mt-space-md">
+<div class="border border-[#DDE2DC] rounded-lg p-space-sm">
+<div class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">Plants found</div>
+<div class="font-metric-display text-metric-display text-primary">{{ results.plants | default('—') }}</div>
+</div>
+<div class="border border-[#DDE2DC] rounded-lg p-space-sm">
+<div class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">To spray</div>
+<div class="font-metric-display text-metric-display text-[#D2452B]">{{ results.spray | default('—') }}</div>
+</div>
+<div class="border border-[#DDE2DC] rounded-lg p-space-sm">
+<div class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">Rounds · your fixes</div>
+<div class="font-metric-display text-metric-display text-primary">{{ results.round | default('—') }} · {{ results.corrections | default(0) }}</div>
+</div>
+<div class="border border-[#DDE2DC] rounded-lg p-space-sm">
+<div class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">Test frames</div>
+<div class="font-metric-display text-metric-display text-primary">{{ test_photos|length }}</div>
+</div>
+</div>
+<p class="font-body-default text-body-default text-on-surface mt-space-md">You checked the AI's labels on this field's test photos and confirmed them. The robot is not connected yet, so nothing has been sprayed.{% if results.taught and (results.taught.corrections or results.taught.labeled) %} Taught by {% if results.taught.corrections %}{{ results.taught.corrections }} fixes{% endif %}{% if results.taught.corrections and results.taught.labeled %} + {% endif %}{% if results.taught.labeled %}{{ results.taught.labeled }} labeled examples{% endif %}.{% endif %}</p>
+{% if model %}
+{% set h = model.honest_score %}
+<div class="mt-space-md border border-[#DDE2DC] rounded-lg p-space-sm flex flex-col gap-space-sm">
+<div class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">Field model (saved {{ model.saved_at }}) · checklist v{{ model.checklist_version }}</div>
+<div class="grid grid-cols-3 gap-space-sm">
+<div><div class="font-metric-display-mobile text-metric-display-mobile {{ 'text-[#D2452B]' if h.crop_hits else 'text-[#2E9E5B]' }}">{{ h.crop_hits if h.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">CROPS HIT</div></div>
+<div><div class="font-metric-display-mobile text-metric-display-mobile text-primary">{{ (h.weeds_hit ~ '/' ~ h.weeds) if h.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">WEEDS CAUGHT</div></div>
+<div><div class="font-metric-display-mobile text-metric-display-mobile text-primary">{{ (h.accuracy_pct|round(0)|int ~ '%') if h.scored_on else '—' }}</div><div class="font-label-instrument text-label-instrument text-on-surface-variant">LABELS RIGHT</div></div>
+</div>
+<p class="font-caption text-caption text-on-surface-variant">Honest score: the AI's own labels before your fixes, on the {{ h.scored_on }} of {{ h.of }} test photos you reviewed.</p>
+<details data-key="model-checklist">
+<summary class="cursor-pointer font-body-strong text-body-strong text-primary min-h-[44px] flex items-center">Checklist the robot will use</summary>
+<p class="font-body-default text-body-default whitespace-pre-line border-l-2 border-secondary pl-2">{{ model.checklist }}</p>
+</details>
+<p class="font-caption text-caption text-on-surface-variant">Crop grows as {{ model.band.crop_layout or '—' }}{% if model.band.width_px %}, band about {{ model.band.width_px|round(0)|int }} px wide{% endif %} · crop median size {{ model.crop_median_area|int if model.crop_median_area else '—' }} px · {{ model.references.crop|length }} crop + {{ model.references.weed|length }} weed example plants · learning took {{ (model.setup_seconds or 0)|round(0)|int }} s and ${{ '%.3f'|format(model.cost_usd or 0) }}.</p>
+<div class="flex flex-wrap gap-2">
+{% for lab in ('crop', 'weed') %}{% for f in model.references[lab] %}
+<img src="/setup_img/{{ field }}/{{ f.split(field ~ '/', 1)[1] }}?w=140" alt="{{ lab }} example" class="w-16 h-16 object-cover rounded border-2 {{ 'border-[#2E9E5B]' if lab == 'crop' else 'border-[#D2452B]' }}"/>
+{% endfor %}{% endfor %}
+</div>
+</div>
+{% endif %}
+{% else %}
+<div class="mt-space-md p-space-md bg-surface-container-low border border-[#DDE2DC] rounded-lg">
+<p class="font-body-strong text-body-strong text-primary">Not ready yet.</p>
+<p class="font-body-default text-body-default text-on-surface-variant mt-1">Run the blind test on the Results page, fix any mistakes, and confirm when you are satisfied.</p>
+</div>
+{% endif %}
+<div class="flex flex-col sm:flex-row gap-space-sm mt-space-md">
+<a class="px-space-lg py-2.5 rounded bg-[#18201B] text-white text-label-instrument font-label-instrument hover:bg-primary transition-colors flex items-center justify-center gap-space-xs min-h-[48px]" href="/">
+<span>Back to Home</span>
+</a>
+<a class="px-space-md py-2.5 rounded border border-outline-variant text-primary text-label-instrument font-label-instrument hover:bg-surface-container transition-colors flex items-center justify-center gap-2 min-h-[48px]" href="/field/{{ field }}/results">
+<span>Check the Results</span>
+<span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</a>
+</div>
+</section>
+</main>
+<footer class="w-full bg-surface-container-low border-t border-outline-variant px-4 py-space-xs flex justify-between items-center text-on-surface-variant font-label-instrument text-label-instrument flex-wrap gap-2">
+<span class="font-metric-inline text-caption text-primary font-medium">OpenWeeder</span>
+<a class="hover:text-primary transition-colors" href="/">Home</a>
+</footer>
+</body></html>

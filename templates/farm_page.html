@@ -1,0 +1,29 @@
+{% set title = 'OpenWeeder — Field' %}
+{% include '_head.html' %}
+<body class="bg-[#F5F6F3] text-on-surface antialiased min-h-screen flex flex-col font-body-default text-body-default">
+{% include '_nav.html' %}
+<header class="w-full bg-surface-container-lowest border-b border-[#DDE2DC] px-4 lg:px-gutter-desktop py-space-sm flex items-center justify-between sticky top-0 z-40 flex-wrap gap-2">
+<div class="flex items-center gap-space-xs">
+<span class="w-3 h-3 bg-secondary rounded-sm"></span>
+<a href="/" class="text-section-title font-section-title font-semibold text-primary">OpenWeeder</a>
+<span class="text-outline-variant">/</span>
+<nav class="flex items-center gap-space-2xs font-caption text-caption text-on-surface-variant">
+<a href="/fields" class="hover:text-primary">Fields</a><span class="text-outline-variant">/</span><span class="text-primary font-body-strong">{{ f.name }}</span>
+</nav>
+</div>
+</header>
+<main class="w-full max-w-[960px] mx-auto px-4 lg:px-margin-desktop py-space-lg flex-1 flex flex-col gap-space-md">
+
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<span class="font-label-instrument text-label-instrument uppercase text-on-surface-variant">FIELD</span>
+<h1 class="font-page-title text-page-title text-primary tracking-tight">{{ f.name }}</h1>
+<p class="text-body-default text-on-surface-variant mt-1">{{ f.columns }} columns to weed &middot; created {{ f.created }}</p>
+</section>
+<section class="bg-surface-container-lowest border border-[#DDE2DC] rounded-xl p-space-lg">
+<h2 class="text-section-title font-section-title text-primary mb-space-xs">Detection crop</h2>
+<p class="text-body-default"><a class="underline" href="/field/{{ f.crop_name }}">{{ f.crop_name }}</a> &middot; {{ f.crop_type }}</p>
+<p class="text-caption text-on-surface-variant mt-1">Detector: stand-in. The robot will use the offline model trained for this crop once it exists; until then the simulator replays the AI's cached labels.</p>
+<p class="text-caption text-on-surface-variant mt-1">The robot is not connected yet, so nothing runs from this page.</p>
+</section>
+</main>
+</body></html>
